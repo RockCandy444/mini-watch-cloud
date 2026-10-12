@@ -1,0 +1,6 @@
+{% if errors %}<div class="form-errors" role="alert"><strong>입력 내용을 확인해 주세요.</strong><ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" action="{{ form_action }}" class="post-form" novalidate>
+  <div class="form-field"><label for="title">제목 <span class="required-label">필수</span></label><input id="title" name="title" type="text" value="{{ title }}" placeholder="어떤 이야기를 나누고 싶나요?" required {% if errors and not title %}aria-invalid="true"{% endif %}></div>
+  <div class="form-field"><label for="body">내용 <span class="required-label">필수</span></label><textarea id="body" name="body" rows="10" placeholder="생각을 자유롭게 남겨 주세요." required {% if errors and not body %}aria-invalid="true"{% endif %}>{{ body }}</textarea><p class="field-help">제목과 내용을 모두 입력해 주세요.</p></div>
+  <div class="form-actions"><a class="button button-secondary" href="{{ cancel_url }}">취소</a><button class="button button-primary" type="submit">{{ submit_label }}</button></div>
+</form>

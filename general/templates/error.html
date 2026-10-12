@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}게시글을 찾을 수 없습니다{% endblock %}
+{% block content %}
+<section class="content-card confirmation-card error-card"><p class="error-number">404</p><h1>{{ message }}</h1><p class="page-description">글이 삭제되었거나 주소가 올바르지 않을 수 있어요.</p><a class="button button-primary" href="{{ url_for('posts.index') }}">목록으로</a></section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}게시글 수정{% endblock %}
+{% block content %}
+<div class="page-top"><a class="back-link" href="{{ url_for('posts.detail', post_id=post.id) }}">← 글로 돌아가기</a><span class="quiet-label">이야기 다듬기</span></div>
+<section class="content-card"><p class="eyebrow">EDIT POST NO. {{ post.id }}</p><h1>이야기를 다듬어 보세요<span class="accent-dot">.</span></h1><p class="page-description">수정한 내용은 저장 버튼을 누르면 반영됩니다.</p>
+{% set form_action = url_for('posts.edit', post_id=post.id) %}{% set cancel_url = url_for('posts.detail', post_id=post.id) %}{% set submit_label = '수정 저장' %}{% include '_post_form.html' %}
+</section>
+{% endblock %}

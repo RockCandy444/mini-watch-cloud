@@ -1,0 +1,255 @@
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 3, "total": 11}}
+HTTP 8082/api/notes: 200
+{"notes": [{"id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}]}
+HTTP 8082/api/notes/1: 200
+{"note": {"body": "로그인 실패와 성공을 확인했다", "created_at": "Mon, 12 Oct 2026 06:51:01 GMT", "id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}}
+$ docker compose -f compose-general.yaml ps -q
+d007f5f17e6b8a24b8b5773d50df3a4093ea62fe08e1f93464960fd1a3fcd4af
+bbbd9420ce2487bc9701aa23709359a4dca558a639d91545c83b0950c1f7af73
+b143aa494c4281ea34316f73710ea961c0ca0ba830b00002515d4878db90f582
+[exit 0]
+$ docker compose -f compose-monitor.yaml ps -q
+6b38ae33d3f70b0ad5e27d3f441736760c47b2e6a43535e6a441a3f1f86ab679
+8a2cc5155c8533cb90d2ced48a5d1daf8c23d8034f5293a1aa93a7295f1b5db2
+6645ed4c79b806d7a226846899a5496d8d3f6d3b8673fb1095d9680fa33f9e10
+bea9ef45226998dbd22e6839297ea69f2cfe7bcdd3df12d86516c2a5014a36f4
+[exit 0]
+$ docker compose -f compose-general.yaml down
+ Container m5d1-general-general-gateway-1 Stopping 
+ Container m5d1-general-general-gateway-1 Stopped 
+ Container m5d1-general-general-gateway-1 Removing 
+ Container m5d1-general-general-gateway-1 Removed 
+ Container m5d1-general-general-api-1 Stopping 
+ Container m5d1-general-general-api-1 Stopped 
+ Container m5d1-general-general-api-1 Removing 
+ Container m5d1-general-general-api-1 Removed 
+ Container m5d1-general-general-db-1 Stopping 
+ Container m5d1-general-general-db-1 Stopped 
+ Container m5d1-general-general-db-1 Removing 
+ Container m5d1-general-general-db-1 Removed 
+ Network m5d1-general_general-data Removing 
+ Network m5d1-general_general-web Removing 
+ Network m5d1-general_general-web Removed 
+ Network m5d1-general_general-data Removed 
+[exit 0]
+$ docker compose -f compose-monitor.yaml down
+ Container m5d1-monitor-monitor-gateway-1 Stopping 
+ Container m5d1-monitor-monitor-gateway-1 Stopped 
+ Container m5d1-monitor-monitor-gateway-1 Removing 
+ Container m5d1-monitor-monitor-gateway-1 Removed 
+ Container m5d1-monitor-monitor-web-1 Stopping 
+ Container m5d1-monitor-monitor-web-1 Stopped 
+ Container m5d1-monitor-monitor-web-1 Removing 
+ Container m5d1-monitor-monitor-web-1 Removed 
+ Container m5d1-monitor-monitor-api-1 Stopping 
+ Container m5d1-monitor-monitor-api-1 Stopped 
+ Container m5d1-monitor-monitor-api-1 Removing 
+ Container m5d1-monitor-monitor-api-1 Removed 
+ Container m5d1-monitor-monitor-db-1 Stopping 
+ Container m5d1-monitor-monitor-db-1 Stopped 
+ Container m5d1-monitor-monitor-db-1 Removing 
+ Container m5d1-monitor-monitor-db-1 Removed 
+ Network m5d1-monitor_monitor-data Removing 
+ Network m5d1-monitor_monitor-web Removing 
+ Network m5d1-monitor_monitor-data Removed 
+ Network m5d1-monitor_monitor-web Removed 
+[exit 0]
+$ docker compose -f compose-monitor.yaml up -d
+ Network m5d1-monitor_monitor-data Creating 
+ Network m5d1-monitor_monitor-web Creating 
+ Network m5d1-monitor_monitor-data Creating 
+ Network m5d1-monitor_monitor-web Creating 
+ Network m5d1-monitor_monitor-web Created 
+ Network m5d1-monitor_monitor-web Created 
+ Network m5d1-monitor_monitor-data Created 
+ Network m5d1-monitor_monitor-data Created 
+ Container m5d1-monitor-monitor-db-1 Creating 
+ Container m5d1-monitor-monitor-db-1 Created 
+ Container m5d1-monitor-monitor-api-1 Creating 
+ Container m5d1-monitor-monitor-api-1 Created 
+ Container m5d1-monitor-monitor-web-1 Creating 
+ Container m5d1-monitor-monitor-web-1 Created 
+ Container m5d1-monitor-monitor-gateway-1 Creating 
+ Container m5d1-monitor-monitor-gateway-1 Created 
+ Container m5d1-monitor-monitor-db-1 Starting 
+ Container m5d1-monitor-monitor-db-1 Started 
+ Container m5d1-monitor-monitor-db-1 Waiting 
+ Container m5d1-monitor-monitor-db-1 Healthy 
+ Container m5d1-monitor-monitor-api-1 Starting 
+ Container m5d1-monitor-monitor-api-1 Started 
+ Container m5d1-monitor-monitor-web-1 Starting 
+ Container m5d1-monitor-monitor-web-1 Started 
+ Container m5d1-monitor-monitor-gateway-1 Starting 
+ Container m5d1-monitor-monitor-gateway-1 Started 
+[exit 0]
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+$ docker compose -f compose-general.yaml up -d
+ Network m5d1-general_general-data Creating 
+ Network m5d1-general_general-web Creating 
+ Network m5d1-general_general-data Creating 
+ Network m5d1-general_general-web Creating 
+ Network m5d1-general_general-data Created 
+ Network m5d1-general_general-data Created 
+ Container m5d1-general-general-db-1 Creating 
+ Network m5d1-general_general-web Created 
+ Network m5d1-general_general-web Created 
+ Container m5d1-general-general-db-1 Created 
+ Container m5d1-general-general-api-1 Creating 
+ Container m5d1-general-general-api-1 Created 
+ Container m5d1-general-general-gateway-1 Creating 
+ Container m5d1-general-general-gateway-1 Created 
+ Container m5d1-general-general-db-1 Starting 
+ Container m5d1-general-general-db-1 Started 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-api-1 Starting 
+ Container m5d1-general-general-api-1 Started 
+ Container m5d1-general-general-gateway-1 Starting 
+ Container m5d1-general-general-gateway-1 Started 
+[exit 0]
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 3, "total": 11}}
+HTTP 8082/api/notes: 200
+{"notes": [{"id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}]}
+HTTP 8082/api/notes/1: 200
+{"note": {"body": "로그인 실패와 성공을 확인했다", "created_at": "Mon, 12 Oct 2026 06:51:01 GMT", "id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}}
+$ docker compose -f compose-general.yaml ps -q
+afe91e176df6733cf2f7a46aae7930cd9c6ff1eeebf81f1ac79165f250c4d038
+d31788c20dbf746792f91f17d51bb1be0f7762b8d7b76b8f5d86f5956b616f09
+d85f18614fc8bdff15d160b45e45009fa0fbd523a97a879e0f20d21831292867
+[exit 0]
+$ docker compose -f compose-monitor.yaml ps -q
+315c0163eb2df27a5385c94686e84998b6ed2e6bd30e18a8a268c1b5b80d92e5
+1b2693de920bc2ed5035586cff9c851a41f5f8e0affe860da7ebe6433d645861
+f0b6eeaef5c1610dcfdf8ca30a0e7e698b4565a28517e64ec3814cba59ff6b2c
+3a86d7b4e5a1ba5ad27976b68bdb1034d954f874ebffeb21628bc0d212c847a2
+[exit 0]
+PASS: both Compose containers recreated without -v; exact event and note data preserved.
+HTTP 8081/auth/login: 401
+{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+HTTP 8081/: 200
+{"html_received": 1821, "contains_board": true}
+$ docker compose -f compose-monitor.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-monitor.yaml ps
+NAME                             IMAGE                      COMMAND                  SERVICE           CREATED          STATUS                    PORTS
+m5d1-monitor-monitor-api-1       m5d1-monitor-monitor-api   "flask --app app run…"   monitor-api       27 seconds ago   Up 23 seconds             5000/tcp
+m5d1-monitor-monitor-db-1        postgres:16-alpine         "docker-entrypoint.s…"   monitor-db        28 seconds ago   Up 26 seconds (healthy)   5432/tcp
+m5d1-monitor-monitor-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   monitor-gateway   27 seconds ago   Up 22 seconds             127.0.0.1:8082->80/tcp
+m5d1-monitor-monitor-web-1       m5d1-monitor-monitor-web   "docker-entrypoint.s…"   monitor-web       27 seconds ago   Up 23 seconds             3000/tcp
+[exit 0]
+$ docker compose -f compose-monitor.yaml logs --tail=35 monitor-api
+monitor-api-1  |  * Serving Flask app 'app'
+monitor-api-1  |  * Debug mode: off
+monitor-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+monitor-api-1  |  * Running on all addresses (0.0.0.0)
+monitor-api-1  |  * Running on http://127.0.0.1:5000
+monitor-api-1  |  * Running on http://172.21.0.2:5000
+monitor-api-1  | [33mPress CTRL+C to quit[0m
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:52:30] "POST /api/auth/login HTTP/1.0" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:52:32] "GET /api/auth/me HTTP/1.0" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:52:39] "GET /api/events HTTP/1.0" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:52:41] "GET /api/notes HTTP/1.0" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:52:43] "GET /api/notes/1 HTTP/1.0" 200 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:52:46] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:52:48] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:52:50] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+[exit 0]
+$ docker compose -f compose-general.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-general.yaml ps
+NAME                             IMAGE                      COMMAND                  SERVICE           CREATED          STATUS                    PORTS
+m5d1-general-general-api-1       m5d1-general-general-api   "flask --app app run…"   general-api       19 seconds ago   Up 15 seconds             5000/tcp
+m5d1-general-general-db-1        postgres:16-alpine         "docker-entrypoint.s…"   general-db        19 seconds ago   Up 18 seconds (healthy)   5432/tcp
+m5d1-general-general-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   general-gateway   19 seconds ago   Up 15 seconds             127.0.0.1:8081->80/tcp
+[exit 0]
+$ docker compose -f compose-general.yaml logs --tail=35 general-api
+general-api-1  |  * Serving Flask app 'app'
+general-api-1  |  * Debug mode: off
+general-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+general-api-1  |  * Running on all addresses (0.0.0.0)
+general-api-1  |  * Running on http://127.0.0.1:5000
+general-api-1  |  * Running on http://172.21.0.3:5000
+general-api-1  | [33mPress CTRL+C to quit[0m
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:46] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:48] "POST /auth/login HTTP/1.0" 200 -
+general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:50] "GET / HTTP/1.0" 200 -
+[exit 0]
+$ docker network inspect m5d1-events
+[
+    {
+        "Name": "m5d1-events",
+        "Id": "7d87c17eba62c89a711bd421c6b394518f2bc1dd521ed6400c00995831e60706",
+        "Created": "2026-10-12T06:46:17.994827103Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {},
+        "Containers": {
+            "315c0163eb2df27a5385c94686e84998b6ed2e6bd30e18a8a268c1b5b80d92e5": {
+                "Name": "m5d1-monitor-monitor-api-1",
+                "EndpointID": "020d12d034ada6001191d8549dc2038912312a4cb7666602ce5473661cf041e0",
+                "MacAddress": "e6:ea:ee:84:a9:5d",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            },
+            "afe91e176df6733cf2f7a46aae7930cd9c6ff1eeebf81f1ac79165f250c4d038": {
+                "Name": "m5d1-general-general-api-1",
+                "EndpointID": "f52fb5ebb19253da922f2389377f65864656dfd4bfde3ebecb016c99816caaf7",
+                "MacAddress": "16:18:76:34:57:96",
+                "IPv4Address": "172.21.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.21.0.0/16": {
+                        "IPsInUse": 5,
+                        "DynamicIPsAvailable": 65531
+                    }
+                }
+            }
+        }
+    }
+]
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
+172.21.0.2      monitor-api
+[exit 0]
+PHASE PASSED: recreate

@@ -1,0 +1,462 @@
+$ docker compose -f compose-monitor.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-general.yaml config --quiet
+[exit 0]
+$ docker network ls --format {{.Name}}
+bridge
+day8-lab_default
+host
+m3-d1_default
+m3-d3_default
+m5d1-events
+m5d1-monitor_monitor-data
+m5d1-monitor_monitor-web
+none
+[exit 0]
+$ docker compose -f compose-monitor.yaml up -d --build
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.20kB 0.0s done
+#1 DONE 0.0s
+
+#2 [monitor-api internal] load build definition from Dockerfile
+#2 transferring dockerfile: 513B done
+#2 DONE 0.0s
+
+#3 [monitor-web internal] load build definition from Dockerfile
+#3 transferring dockerfile: 488B done
+#3 DONE 0.0s
+
+#4 [monitor-web internal] load metadata for docker.io/library/node:22-alpine
+#4 ...
+
+#5 [monitor-api internal] load metadata for docker.io/library/python:3.12-slim
+#5 DONE 0.8s
+
+#4 [monitor-web internal] load metadata for docker.io/library/node:22-alpine
+#4 DONE 0.8s
+
+#6 [monitor-api internal] load .dockerignore
+#6 transferring context: 179B done
+#6 DONE 0.0s
+
+#7 [monitor-web internal] load .dockerignore
+#7 transferring context: 90B done
+#7 DONE 0.0s
+
+#8 [monitor-api 1/8] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#8 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#8 DONE 0.0s
+
+#9 [monitor-web build 1/6] FROM docker.io/library/node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+#9 resolve docker.io/library/node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 0.0s done
+#9 DONE 0.0s
+
+#10 [monitor-api internal] load build context
+#10 transferring context: 14.38kB done
+#10 DONE 0.0s
+
+#11 [monitor-web internal] load build context
+#11 transferring context: 12.44kB done
+#11 DONE 0.0s
+
+#12 [monitor-web build 3/6] COPY package.json package-lock.json ./
+#12 CACHED
+
+#13 [monitor-web build 2/6] WORKDIR /app
+#13 CACHED
+
+#14 [monitor-web build 4/6] RUN npm ci
+#14 CACHED
+
+#15 [monitor-api 5/8] COPY common /app/common
+#15 CACHED
+
+#16 [monitor-api 4/8] RUN pip install --no-cache-dir -r monitor/backend/requirements.txt
+#16 CACHED
+
+#17 [monitor-api 3/8] COPY monitor/backend/requirements.txt /app/monitor/backend/requirements.txt
+#17 CACHED
+
+#18 [monitor-api 2/8] WORKDIR /app
+#18 CACHED
+
+#19 [monitor-api 6/8] COPY monitor/__init__.py /app/monitor/__init__.py
+#19 CACHED
+
+#20 [monitor-web build 5/6] COPY . .
+#20 DONE 0.1s
+
+#21 [monitor-api 7/8] COPY monitor/backend /app/monitor/backend
+#21 DONE 0.1s
+
+#22 [monitor-api 8/8] WORKDIR /app/monitor/backend
+#22 DONE 0.1s
+
+#23 [monitor-api] exporting to image
+#23 exporting layers 0.1s done
+#23 exporting manifest sha256:23c7ace1f91d43bfeb8e868921821c914f35a5cf6779742ad58563ababfecd41 0.0s done
+#23 exporting config sha256:b5ad64e38a9872765232ab78e4350251de5885b7a261279d7d380714c81f18e4 0.0s done
+#23 exporting attestation manifest sha256:9a53f50937be2fda3cb5d0a7574e2d6af00653bafb0c2f1085bc0b6899f723ba 0.0s done
+#23 exporting manifest list sha256:1ad708ec7bd6141ff0664f30f84bf8508824935ee31bac951863ba654ba8fbd4 0.0s done
+#23 naming to docker.io/library/m5d1-monitor-monitor-api:latest done
+#23 unpacking to docker.io/library/m5d1-monitor-monitor-api:latest 0.1s done
+#23 DONE 0.3s
+
+#24 [monitor-api] resolving provenance for metadata file
+#24 DONE 0.0s
+
+#25 [monitor-web build 6/6] RUN npm run build
+#25 0.308 
+#25 0.308 > mini-watch-dashboard@1.0.0 build
+#25 0.308 > next build
+#25 0.308 
+#25 0.736 ▲ Next.js 16.4.0 (Turbopack)
+#25 0.757 ✓ Running next.config.mjs took 20ms
+#25 0.780 
+#25 0.812   Creating an optimized production build ...
+#25 2.440 ✓ Compiled successfully in 1624ms
+#25 2.443   Running TypeScript ...
+#25 2.452   Finished TypeScript in 5ms ...
+#25 2.452   Collecting page data using 7 workers ...
+#25 3.179   Generating static pages using 7 workers (0/6) ...
+#25 3.738   Generating static pages using 7 workers (1/6) 
+#25 3.738   Generating static pages using 7 workers (2/6) 
+#25 3.747   Generating static pages using 7 workers (4/6) 
+#25 3.749 ✓ Generating static pages using 7 workers (6/6) in 570ms
+#25 3.753   Finalizing page optimization ...
+#25 3.926 
+#25 3.928 Route (app)
+#25 3.928 ┌ ○ /
+#25 3.928 ├ ○ /_not-found
+#25 3.928 ├ ○ /notes
+#25 3.928 ├ ○ /register
+#25 3.928 └ ○ /register/general
+#25 3.928 
+#25 3.928 
+#25 3.928 ○  (Static)  prerendered as static content
+#25 3.928 
+#25 DONE 4.0s
+
+#13 [monitor-web build 2/6] WORKDIR /app
+#13 CACHED
+
+#26 [monitor-web runtime 3/4] COPY --from=build --chown=node:node /app/.next/standalone ./
+#26 DONE 0.3s
+
+#27 [monitor-web runtime 4/4] COPY --from=build --chown=node:node /app/.next/static ./.next/static
+#27 DONE 0.1s
+
+#28 [monitor-web] exporting to image
+#28 exporting layers 1.2s done
+#28 exporting manifest sha256:00962b1f077e22d8eb4bee71cbfda1480e5fdb8a57983d07f651c80d4dd3f430 0.0s done
+#28 exporting config sha256:685ec5e76ec627643c192741d8a359f201b02191df302d374ec011b1b5cfd4c6 0.0s done
+#28 exporting attestation manifest sha256:27accc171c77c7993076bdb393ca72da874ec4fe8b499ff68dbaeb7e9abc7e6d 0.0s done
+#28 exporting manifest list sha256:7a6fce00e157b4c54af7ee5d35e9b08f566c28b12b643d84a3513ee27b15b5c8 0.0s done
+#28 naming to docker.io/library/m5d1-monitor-monitor-web:latest done
+#28 unpacking to docker.io/library/m5d1-monitor-monitor-web:latest
+#28 unpacking to docker.io/library/m5d1-monitor-monitor-web:latest 0.4s done
+#28 DONE 1.7s
+
+#29 [monitor-web] resolving provenance for metadata file
+#29 DONE 0.0s
+ Image m5d1-monitor-monitor-api Building 
+ Image m5d1-monitor-monitor-web Building 
+ Image m5d1-monitor-monitor-api Built 
+ Image m5d1-monitor-monitor-web Built 
+ Container m5d1-monitor-monitor-gateway-1 Running 
+ Container m5d1-monitor-monitor-db-1 Running 
+ Container m5d1-monitor-monitor-api-1 Recreate 
+ Container m5d1-monitor-monitor-api-1 Recreated 
+ Container m5d1-monitor-monitor-web-1 Recreate 
+ Container m5d1-monitor-monitor-web-1 Recreated 
+ Container m5d1-monitor-monitor-db-1 Waiting 
+ Container m5d1-monitor-monitor-db-1 Healthy 
+ Container m5d1-monitor-monitor-api-1 Starting 
+ Container m5d1-monitor-monitor-api-1 Started 
+ Container m5d1-monitor-monitor-web-1 Starting 
+ Container m5d1-monitor-monitor-web-1 Started 
+[exit 0]
+$ docker compose -f compose-monitor.yaml exec -T monitor-api python create_user.py --classroom
+계정을 만들었습니다.
+[exit 0]
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+$ docker compose -f compose-general.yaml up -d --build
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 487B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 179B done
+#4 DONE 0.0s
+
+#5 [1/9] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#5 DONE 0.0s
+
+#6 [2/9] WORKDIR /app
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 53.91kB 0.0s done
+#7 DONE 0.0s
+
+#8 [3/9] COPY general/requirements.txt /app/general/requirements.txt
+#8 DONE 0.0s
+
+#9 [4/9] RUN pip install --no-cache-dir -r general/requirements.txt
+#9 1.074 Collecting Flask==3.1.3 (from -r general/requirements.txt (line 1))
+#9 1.117   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+#9 1.136 Collecting psycopg==3.2.10 (from psycopg[binary]==3.2.10->-r general/requirements.txt (line 2))
+#9 1.145   Downloading psycopg-3.2.10-py3-none-any.whl.metadata (4.6 kB)
+#9 1.165 Collecting python-dotenv==1.2.1 (from -r general/requirements.txt (line 3))
+#9 1.173   Downloading python_dotenv-1.2.1-py3-none-any.whl.metadata (25 kB)
+#9 1.203 Collecting requests==2.32.5 (from -r general/requirements.txt (line 4))
+#9 1.211   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+#9 1.427 Collecting SQLAlchemy==2.0.48 (from -r general/requirements.txt (line 5))
+#9 1.436   Downloading sqlalchemy-2.0.48-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.5 kB)
+#9 1.457 Collecting blinker>=1.9.0 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.466   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#9 1.483 Collecting click>=8.1.3 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.492   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#9 1.507 Collecting itsdangerous>=2.2.0 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.514   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#9 1.530 Collecting jinja2>=3.1.2 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.537   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#9 1.577 Collecting markupsafe>=2.1.1 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.585   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#9 1.606 Collecting werkzeug>=3.1.0 (from Flask==3.1.3->-r general/requirements.txt (line 1))
+#9 1.613   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+#9 1.631 Collecting typing-extensions>=4.6 (from psycopg==3.2.10->psycopg[binary]==3.2.10->-r general/requirements.txt (line 2))
+#9 1.639   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#9 1.722 Collecting charset_normalizer<4,>=2 (from requests==2.32.5->-r general/requirements.txt (line 4))
+#9 1.730   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+#9 1.750 Collecting idna<4,>=2.5 (from requests==2.32.5->-r general/requirements.txt (line 4))
+#9 1.759   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#9 1.783 Collecting urllib3<3,>=1.21.1 (from requests==2.32.5->-r general/requirements.txt (line 4))
+#9 1.791   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+#9 1.810 Collecting certifi>=2017.4.17 (from requests==2.32.5->-r general/requirements.txt (line 4))
+#9 1.819   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+#9 1.914 Collecting greenlet>=1 (from SQLAlchemy==2.0.48->-r general/requirements.txt (line 5))
+#9 1.923   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#9 2.050 Collecting psycopg-binary==3.2.10 (from psycopg[binary]==3.2.10->-r general/requirements.txt (line 2))
+#9 2.059   Downloading psycopg_binary-3.2.10-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.0 kB)
+#9 2.077 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#9 2.090 Downloading psycopg-3.2.10-py3-none-any.whl (206 kB)
+#9 2.106 Downloading python_dotenv-1.2.1-py3-none-any.whl (21 kB)
+#9 2.115 Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+#9 2.128 Downloading sqlalchemy-2.0.48-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.3 MB)
+#9 2.378    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 13.6 MB/s eta 0:00:00
+#9 2.386 Downloading psycopg_binary-3.2.10-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.4 MB)
+#9 2.738    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 12.4 MB/s eta 0:00:00
+#9 2.744 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#9 2.751 Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+#9 2.767 Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+#9 2.793 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#9 2.809 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (621 kB)
+#9 2.826    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 621.4/621.4 kB 54.2 MB/s eta 0:00:00
+#9 2.833 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#9 2.844 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#9 2.851 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#9 2.866 Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#9 2.873 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#9 2.882 Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+#9 2.896 Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+#9 2.949 Installing collected packages: urllib3, typing-extensions, python-dotenv, psycopg-binary, markupsafe, itsdangerous, idna, greenlet, click, charset_normalizer, certifi, blinker, werkzeug, SQLAlchemy, requests, psycopg, jinja2, Flask
+#9 4.445 Successfully installed Flask-3.1.3 SQLAlchemy-2.0.48 blinker-1.9.0 certifi-2026.7.22 charset_normalizer-3.5.2 click-8.5.0 greenlet-3.5.6 idna-3.20 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 psycopg-3.2.10 psycopg-binary-3.2.10 python-dotenv-1.2.1 requests-2.32.5 typing-extensions-4.16.0 urllib3-2.8.0 werkzeug-3.1.9
+#9 4.446 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#9 4.511 
+#9 4.511 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#9 4.511 [notice] To update, run: pip install --upgrade pip
+#9 DONE 4.8s
+
+#10 [5/9] COPY common /app/common
+#10 DONE 0.1s
+
+#11 [6/9] COPY general /app/general
+#11 DONE 0.1s
+
+#12 [7/9] COPY monitor/__init__.py /app/monitor/__init__.py
+#12 DONE 0.1s
+
+#13 [8/9] COPY monitor/backend /app/monitor/backend
+#13 DONE 0.1s
+
+#14 [9/9] WORKDIR /app/general
+#14 DONE 0.1s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 1.5s done
+#15 exporting manifest sha256:55e69548340327feaa5e5ae05beb90e8880be0874ce90384aacb6ecbca60bcbd 0.0s done
+#15 exporting config sha256:4f63c5b63111cb404189a322bfeb03cf98ee4459374f758bd3a7489d346406fb 0.0s done
+#15 exporting attestation manifest sha256:ea20bb796119045ecea2b36d82440462c48f8c4ff6866011f3f5d52e4924f540 0.0s done
+#15 exporting manifest list sha256:4273d138994863e6c3cf488cb232a57535fe08f82cd640336428921cc9248648 0.0s done
+#15 naming to docker.io/library/m5d1-general-general-api:latest done
+#15 unpacking to docker.io/library/m5d1-general-general-api:latest
+#15 unpacking to docker.io/library/m5d1-general-general-api:latest 0.4s done
+#15 DONE 2.0s
+
+#16 resolving provenance for metadata file
+#16 DONE 0.0s
+ Image m5d1-general-general-api Building 
+ Image m5d1-general-general-api Built 
+ Network m5d1-general_general-data Creating 
+ Volume m5d1-general_general-data Creating 
+ Network m5d1-general_general-web Creating 
+ Volume m5d1-general_general-data Creating 
+ Network m5d1-general_general-data Creating 
+ Network m5d1-general_general-web Creating 
+ Volume m5d1-general_general-data Created 
+ Volume m5d1-general_general-data Created 
+ Network m5d1-general_general-web Created 
+ Network m5d1-general_general-web Created 
+ Network m5d1-general_general-data Created 
+ Network m5d1-general_general-data Created 
+ Container m5d1-general-general-db-1 Creating 
+ Container m5d1-general-general-db-1 Created 
+ Container m5d1-general-general-api-1 Creating 
+ Container m5d1-general-general-api-1 Created 
+ Container m5d1-general-general-gateway-1 Creating 
+ Container m5d1-general-general-gateway-1 Created 
+ Container m5d1-general-general-db-1 Starting 
+ Container m5d1-general-general-db-1 Started 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-api-1 Starting 
+ Container m5d1-general-general-api-1 Started 
+ Container m5d1-general-general-gateway-1 Starting 
+ Container m5d1-general-general-gateway-1 Started 
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api python create_user.py --classroom
+student 계정을 만들었습니다.
+[exit 0]
+HTTP 8081/auth/login: 401
+{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+HTTP 8081/: 200
+{"html_received": 1821, "contains_board": true}
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 1, "total": 3}}
+$ docker compose -f compose-monitor.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-monitor.yaml ps
+NAME                             IMAGE                      COMMAND                  SERVICE           CREATED          STATUS                   PORTS
+m5d1-monitor-monitor-api-1       m5d1-monitor-monitor-api   "flask --app app run…"   monitor-api       29 seconds ago   Up 28 seconds            5000/tcp
+m5d1-monitor-monitor-db-1        postgres:16-alpine         "docker-entrypoint.s…"   monitor-db        2 minutes ago    Up 2 minutes (healthy)   5432/tcp
+m5d1-monitor-monitor-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   monitor-gateway   2 minutes ago    Up 2 minutes             127.0.0.1:8082->80/tcp
+m5d1-monitor-monitor-web-1       m5d1-monitor-monitor-web   "docker-entrypoint.s…"   monitor-web       29 seconds ago   Up 28 seconds            3000/tcp
+[exit 0]
+$ docker compose -f compose-monitor.yaml logs --tail=35 monitor-api
+monitor-api-1  |  * Serving Flask app 'app'
+monitor-api-1  |  * Debug mode: off
+monitor-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+monitor-api-1  |  * Running on all addresses (0.0.0.0)
+monitor-api-1  |  * Running on http://127.0.0.1:5000
+monitor-api-1  |  * Running on http://172.21.0.2:5000
+monitor-api-1  | [33mPress CTRL+C to quit[0m
+monitor-api-1  | 172.23.0.4 - - [12/Oct/2026 06:49:01] "POST /api/auth/login HTTP/1.0" 200 -
+monitor-api-1  | 172.23.0.4 - - [12/Oct/2026 06:49:03] "GET /api/auth/me HTTP/1.0" 200 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:49:20] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:49:22] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:49:24] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.23.0.4 - - [12/Oct/2026 06:49:26] "GET /api/events HTTP/1.0" 200 -
+[exit 0]
+$ docker compose -f compose-general.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-general.yaml ps
+NAME                             IMAGE                      COMMAND                  SERVICE           CREATED          STATUS                    PORTS
+m5d1-general-general-api-1       m5d1-general-general-api   "flask --app app run…"   general-api       15 seconds ago   Up 11 seconds             5000/tcp
+m5d1-general-general-db-1        postgres:16-alpine         "docker-entrypoint.s…"   general-db        15 seconds ago   Up 15 seconds (healthy)   5432/tcp
+m5d1-general-general-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   general-gateway   15 seconds ago   Up 11 seconds             127.0.0.1:8081->80/tcp
+[exit 0]
+$ docker compose -f compose-general.yaml logs --tail=35 general-api
+general-api-1  |  * Serving Flask app 'app'
+general-api-1  |  * Debug mode: off
+general-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+general-api-1  |  * Running on all addresses (0.0.0.0)
+general-api-1  |  * Running on http://127.0.0.1:5000
+general-api-1  |  * Running on http://172.21.0.3:5000
+general-api-1  | [33mPress CTRL+C to quit[0m
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
+general-api-1  | 172.24.0.3 - - [12/Oct/2026 06:49:20] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
+general-api-1  | 172.24.0.3 - - [12/Oct/2026 06:49:22] "POST /auth/login HTTP/1.0" 200 -
+general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
+general-api-1  | 172.24.0.3 - - [12/Oct/2026 06:49:24] "GET / HTTP/1.0" 200 -
+[exit 0]
+$ docker network inspect m5d1-events
+[
+    {
+        "Name": "m5d1-events",
+        "Id": "7d87c17eba62c89a711bd421c6b394518f2bc1dd521ed6400c00995831e60706",
+        "Created": "2026-10-12T06:46:17.994827103Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {},
+        "Containers": {
+            "6b38ae33d3f70b0ad5e27d3f441736760c47b2e6a43535e6a441a3f1f86ab679": {
+                "Name": "m5d1-monitor-monitor-api-1",
+                "EndpointID": "8b57b44cadc9a0efb68373a509c7aba1e948bdf056bc6323753422c93afbd5b4",
+                "MacAddress": "22:b9:f6:68:4e:4a",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            },
+            "d007f5f17e6b8a24b8b5773d50df3a4093ea62fe08e1f93464960fd1a3fcd4af": {
+                "Name": "m5d1-general-general-api-1",
+                "EndpointID": "87bc5d9715adf196ab50f8d191dca7797188331be8a5747d7bb085dd20eb3fb2",
+                "MacAddress": "de:27:af:7a:e2:2a",
+                "IPv4Address": "172.21.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.21.0.0/16": {
+                        "IPsInUse": 5,
+                        "DynamicIPsAvailable": 65531
+                    }
+                }
+            }
+        }
+    }
+]
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
+172.21.0.2      monitor-api
+[exit 0]
+PHASE PASSED: initial

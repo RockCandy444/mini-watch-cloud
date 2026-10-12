@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}모아 게시판{% endblock %} · mini-watch</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ url_for('posts.index') }}"><span class="brand-mark" aria-hidden="true">m.</span> 모아<span class="brand-caption">작은 생각이 모이는 곳</span></a>
+      <nav aria-label="주 메뉴">
+        <a href="{{ url_for('posts.index') }}" {% if request.endpoint == 'posts.index' %}aria-current="page"{% endif %}>게시판</a>
+        <a href="{{ url_for('auth.login_page') }}" {% if request.endpoint == 'auth.login_page' %}aria-current="page"{% endif %}>로그인</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content" class="main-shell">{% block content %}{% endblock %}</main>
+  <footer class="site-footer"><span>모아 게시판</span><span>생각을 기록하고, 함께 나눠요.</span></footer>
+</body>
+</html>
