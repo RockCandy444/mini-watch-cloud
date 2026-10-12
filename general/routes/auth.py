@@ -41,6 +41,6 @@ def login():
     if user is None or not check_password_hash(user["password_hash"], password):
         return {"error": "아이디 또는 비밀번호가 올바르지 않습니다."}, 401
     return {
-        "message": "로그인 성공",
+        "message": "로그인 성공 · Docker 실행",
         "user": {"id": user["id"], "username": user["username"]},
     }

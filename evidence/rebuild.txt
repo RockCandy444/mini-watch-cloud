@@ -1,0 +1,118 @@
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+$ docker compose -f compose-general.yaml images -q general-api
+4273d138994863e6c3cf488cb232a57535fe08f82cd640336428921cc9248648
+[exit 0]
+$ docker compose -f compose-general.yaml ps -q general-api
+578be7a3c1b52e8f2bc628949f3f111371dd95de7aff944a004091c1da2f189f
+[exit 0]
+$ docker compose -f compose-general.yaml restart general-api
+ Container m5d1-general-general-api-1 Restarting 
+ Container m5d1-general-general-api-1 Started 
+[exit 0]
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+$ docker compose -f compose-general.yaml images -q general-api
+4273d138994863e6c3cf488cb232a57535fe08f82cd640336428921cc9248648
+[exit 0]
+$ docker compose -f compose-general.yaml ps -q general-api
+578be7a3c1b52e8f2bc628949f3f111371dd95de7aff944a004091c1da2f189f
+[exit 0]
+$ docker compose -f compose-general.yaml up -d --build general-api
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 487B done
+#2 DONE 0.0s
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python:3.12-slim
+#4 DONE 1.1s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 179B done
+#5 DONE 0.0s
+
+#6 [1/9] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#6 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 7.71kB done
+#7 DONE 0.0s
+
+#8 [2/9] WORKDIR /app
+#8 CACHED
+
+#9 [3/9] COPY general/requirements.txt /app/general/requirements.txt
+#9 CACHED
+
+#10 [4/9] RUN pip install --no-cache-dir -r general/requirements.txt
+#10 CACHED
+
+#11 [5/9] COPY common /app/common
+#11 CACHED
+
+#12 [6/9] COPY general /app/general
+#12 DONE 0.0s
+
+#13 [7/9] COPY monitor/__init__.py /app/monitor/__init__.py
+#13 DONE 0.1s
+
+#14 [8/9] COPY monitor/backend /app/monitor/backend
+#14 DONE 0.0s
+
+#15 [9/9] WORKDIR /app/general
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.2s done
+#16 exporting manifest sha256:bf4da6d5ba80c8c4eb63234eca7996d8807e94c0eab3a96fc7a99a029a389137 0.0s done
+#16 exporting config sha256:0864833571bb25bbd0e118a6184a1b205a12e59225b440f41494e8d9df0708e5 0.0s done
+#16 exporting attestation manifest sha256:313d9dddd5c9b384c001817c8c21b8ae764fe83a9660d77d985cd83f0d2572b4 0.0s done
+#16 exporting manifest list sha256:36f10bf131557c08b891301d7fdb42599248b7443de32f72e284f045ac33dbcb 0.0s done
+#16 naming to docker.io/library/m5d1-general-general-api:latest done
+#16 unpacking to docker.io/library/m5d1-general-general-api:latest 0.1s done
+#16 DONE 0.4s
+
+#17 resolving provenance for metadata file
+#17 DONE 0.0s
+ Image m5d1-general-general-api Building 
+ Image m5d1-general-general-api Built 
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-api-1 Recreate 
+ Container m5d1-general-general-api-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-api-1 Starting 
+ Container m5d1-general-general-api-1 Started 
+[exit 0]
+$ docker compose -f compose-general.yaml up -d --force-recreate general-gateway
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-api-1 Running 
+ Container m5d1-general-general-gateway-1 Recreate 
+ Container m5d1-general-general-gateway-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-gateway-1 Starting 
+ Container m5d1-general-general-gateway-1 Started 
+[exit 0]
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공 · Docker 실행", "user": {"id": 1, "username": "student"}}
+$ docker compose -f compose-general.yaml images -q general-api
+36f10bf131557c08b891301d7fdb42599248b7443de32f72e284f045ac33dbcb
+[exit 0]
+$ docker compose -f compose-general.yaml ps -q general-api
+b7b6d5f08487b38e2a6d94277ed08871e9ee722d327f2a503a497c60ca72deb6
+[exit 0]
+PASS: restart reused image/container; rebuild copied changed source into NEW image/container.
+PHASE PASSED: rebuild

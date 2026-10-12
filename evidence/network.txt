@@ -1,0 +1,83 @@
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts general-db
+172.24.0.2      general-db
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-db
+[exit 2]
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 14, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:52:50 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 13, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:48 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 12, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:46 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 4, "total": 14}}
+$ docker compose -f compose-general.yaml ps -q general-api
+afe91e176df6733cf2f7a46aae7930cd9c6ff1eeebf81f1ac79165f250c4d038
+[exit 0]
+$ docker network disconnect m5d1-events afe91e176df6733cf2f7a46aae7930cd9c6ff1eeebf81f1ac79165f250c4d038
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
+[exit 2]
+HTTP 8081/auth/login: 401
+{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+HTTP 8081/: 200
+{"html_received": 1821, "contains_board": true}
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 14, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:52:50 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 13, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:48 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 12, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:46 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 4, "total": 14}}
+$ docker compose -f compose-general.yaml logs --tail=30 general-api
+general-api-1  |  * Serving Flask app 'app'
+general-api-1  |  * Debug mode: off
+general-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+general-api-1  |  * Running on all addresses (0.0.0.0)
+general-api-1  |  * Running on http://127.0.0.1:5000
+general-api-1  |  * Running on http://172.21.0.3:5000
+general-api-1  | [33mPress CTRL+C to quit[0m
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:46] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:48] "POST /auth/login HTTP/1.0" 200 -
+general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:52:50] "GET / HTTP/1.0" 200 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
+general-api-1  | [2026-10-12 06:53:49,103] WARNING in request_logging: 감시 서비스에 요청 기록을 보내지 못했습니다.
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:53:49] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
+general-api-1  | [2026-10-12 06:53:55,170] WARNING in request_logging: 감시 서비스에 요청 기록을 보내지 못했습니다.
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:53:55] "POST /auth/login HTTP/1.0" 200 -
+general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
+general-api-1  | [2026-10-12 06:54:01,185] WARNING in request_logging: 감시 서비스에 요청 기록을 보내지 못했습니다.
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:54:01] "GET / HTTP/1.0" 200 -
+[exit 0]
+PASS: disconnected API cannot resolve monitor-api; successful local login remains unforwarded.
+$ docker compose -f compose-general.yaml up -d --force-recreate general-api
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-api-1 Recreate 
+ Container m5d1-general-general-api-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-api-1 Starting 
+ Container m5d1-general-general-api-1 Started 
+[exit 0]
+$ docker compose -f compose-general.yaml up -d --force-recreate general-gateway
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-api-1 Running 
+ Container m5d1-general-general-gateway-1 Recreate 
+ Container m5d1-general-general-gateway-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-gateway-1 Starting 
+ Container m5d1-general-general-gateway-1 Started 
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
+172.21.0.2      monitor-api
+[exit 0]
+HTTP 8081/auth/login: 401
+{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공", "user": {"id": 1, "username": "student"}}
+HTTP 8081/: 200
+{"html_received": 1821, "contains_board": true}
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 17, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:54:16 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 16, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:14 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 15, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:12 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 14, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:52:50 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 13, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:48 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 12, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:46 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 5, "total": 17}}
+PASS: Compose recreated original networks; NEW failure/success records delivered; failed sends not replayed.
+PHASE PASSED: network
