@@ -30,20 +30,32 @@ services:
     depends_on:
       monitor-db:
         condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
     networks: [monitor-web, monitor-data, events]
   monitor-web:
     build: ./monitor/next-frontend
     environment:
       HOSTNAME: 0.0.0.0
       PORT: '3000'
-    depends_on: [monitor-api]
+    depends_on:
+      monitor-api:
+        condition: service_healthy
     networks: [monitor-web]
   monitor-gateway:
     image: nginx:1.28-alpine
     ports: ['127.0.0.1:8082:80']
     volumes:
       - ./gateway/monitor.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on: [monitor-api, monitor-web]
+    depends_on:
+      monitor-api:
+        condition: service_healthy
+      monitor-web:
+        condition: service_started
     networks: [monitor-web]
 networks:
   monitor-web:
