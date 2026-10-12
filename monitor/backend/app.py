@@ -12,7 +12,7 @@ import psycopg
 from flask import Flask, request
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
-from monitor.backend.db import setting
+from monitor.backend.db import setting, connect_db
 from monitor.backend.routes.auth import auth_bp
 from monitor.backend.routes.events import events_bp
 from monitor.backend.routes.notes import notes_bp
@@ -55,7 +55,9 @@ def create_app(test_config=None):
 
     @app.get('/health')
     def health():
-        return {'service': 'monitor', 'status': 'ok'}
+        with connect_db() as conn:
+            conn.execute('SELECT 1')
+        return {'service': 'monitor', 'status': 'ok', 'database': 'ready'}
 
     @app.errorhandler(psycopg.Error)
     @app.errorhandler(SQLAlchemyError)
