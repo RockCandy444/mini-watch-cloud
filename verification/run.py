@@ -1,5 +1,5 @@
 """Docker lifecycle evidence; uses only the Python standard library.
-Run from repository root: python verification/run.py initial|recreate|network|rebuild|final
+Run from repository root: python verification/run.py initial|recreate|network|rebuild|final|postmerge
 """
 import argparse
 import http.cookiejar
@@ -16,7 +16,7 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 EVIDENCE = ROOT / 'evidence'
 EVIDENCE.mkdir(exist_ok=True)
 MODE = argparse.ArgumentParser()
-MODE.add_argument('phase', choices=['initial', 'recreate', 'network', 'rebuild', 'final'])
+MODE.add_argument('phase', choices=['initial', 'recreate', 'network', 'rebuild', 'final', 'postmerge'])
 PHASE = MODE.parse_args().phase
 LOG = EVIDENCE / f'{PHASE}.txt'
 LOG.write_text('', encoding='utf-8')
@@ -25,7 +25,7 @@ opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.coo
 
 def log(text):
     print(text, flush=True)
-    with LOG.open('a', encoding='utf-8') as f:
+    with LOG.open('a', encoding='utf-8', newline='\n') as f:
         f.write(text + '\n')
 
 
@@ -179,5 +179,21 @@ elif PHASE == 'final':
     compose('monitor', 'exec', '-T', 'monitor-api', 'python', '-m', 'unittest', 'discover', '-s', 'tests', '-v')
     compose('general', 'exec', '-T', 'general-api', 'python', '-m', 'unittest', 'discover', '-s', 'tests', '-v')
     state()
+
+elif PHASE == 'postmerge':
+    run('git', 'rev-parse', 'HEAD')
+    compose('monitor', 'up', '-d')
+    wait_monitor()
+    compose('general', 'up', '-d', '--build')
+    compose('general', 'up', '-d', '--force-recreate', 'general-gateway')
+    before = events()
+    login_pair()
+    new_rows = [r for r in events() if r['id'] not in {p['id'] for p in before}]
+    assert {('login_failure', 401), ('login_success', 200)} <= {(r['event_type'], r['status_code']) for r in new_rows}
+    assert any(n['title'] == 'Docker 점검' and n['body'] == '로그인 실패와 성공을 확인했다' for n in notes())
+    compose('monitor', 'exec', '-T', 'monitor-api', 'python', '-c',
+            "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:5000/health'); print(r.status, r.read().decode())")
+    state()
+    log('PASS: merged main rebuilt; new login failure/success forwarded; original note and API DB readiness confirmed.')
 
 log('PHASE PASSED: ' + PHASE)

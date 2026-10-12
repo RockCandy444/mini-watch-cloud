@@ -3,6 +3,7 @@
 [Codemit 과제 51](https://classroom.codemit.kr/classes/5/problems/51/submit)의 일반 게시판과 감시 대시보드를 **서로 독립적인 두 Compose 프로젝트**로 실행합니다.
 로그인 실패·성공 기록은 공유 망을 통해 감시 PostgreSQL에 저장하고, 관찰 메모는 화면에서 작성·새로고침합니다.
 이번 실행에서 얻은 로그·화면은 [evidence](evidence)에 포함합니다. 강의실 제출은 사용자가 직접 진행합니다.
+**필수 20개·선택 4개 확인 완료:** 항목별 근거는 [CHECKLIST.md](CHECKLIST.md), PR과 Git 커밋은 [GIT_WORK.md](GIT_WORK.md)에 정리했습니다.
 
 ## 시작 자료와 변경
 
@@ -88,6 +89,7 @@ DB 망은 `internal: true`이며 DB는 자기 API와만 같은 망을 사용합�
 일반의 `MONITOR_URL`은 `http://monitor-api:5000/api/events`입니다. 컨테이너에서 상대 앱을 `localhost`나 PC 공개 포트로 찾지 않습니다.
 각 DB의 `pg_isready` healthcheck와 API의 `depends_on: service_healthy`로 자기 DB 준비를 기다립니다.
 다른 Compose의 서비스를 `depends_on`으로 지정하지 않고 감시 로그인 응답을 직접 확인한 뒤 일반의 실험을 시작합니다.
+최종 PR에서는 감시 API가 `/health`에서 실제 `SELECT 1`에 성공한 뒤에만 healthy가 되게 하고, 감시 화면·gateway가 이 준비 상태도 기다리게 개선했습니다.
 [Docker의 시작 순서 설명](https://docs.docker.com/compose/how-tos/startup-order/)도 같은 준비 대기 동작을 설명합니다.
 
 ## 화면·DB 확인과 종료
@@ -123,6 +125,9 @@ docker compose -f compose-general.yaml up -d
 | 재생성 후 화면 메모 | [note-after-recreate.jpg](evidence/note-after-recreate.jpg) |
 | 공유 망 분리·복구, DB 격리 | [network.txt](evidence/network.txt), 아래 선택 실험 설명 |
 | restart·rebuild | [rebuild.txt](evidence/rebuild.txt), 아래 비교 설명 |
+| 개선 PR 및 최종 통합 테스트 | [PR #1](https://github.com/RockCandy444/mini-watch-compose/pull/1), [final.txt](evidence/final.txt): 감시 14개·일반 12개 **총 26개 통과** |
+| main 병합 후 실행 재확인 | [postmerge.txt](evidence/postmerge.txt): 새 실패·성공 기록 전달, 기존 메모 상세·DB 준비 응답·망·설정·실행 상태 확인 |
+| 병합 후 화면 | [events-after-merge.jpg](evidence/events-after-merge.jpg)의 #27 실패·#28 성공, [note-after-merge.jpg](evidence/note-after-merge.jpg)의 동일 메모 #1 |
 
 명령 원문과 필요한 응답을 로그에 함께 저장했습니다. `getent` 성공은 Docker DNS와 같은 망 참여의 확인입니다.
 HTTP 200·201 및 화면 기록은 앱의 실제 응답·전달 확인이며, DB 재생성 전후 동일 자료 비교는 저장 지속성 확인입니다.
@@ -149,8 +154,8 @@ gateway도 재생성해 Nginx가 이전 API IP를 계속 사용하지 않게 했
 `getent hosts monitor-db`는 출력 없이 종료 코드 2입니다. 일반 API와 자기 DB는 `general-data`를 공유하지만 감시 DB는 `monitor-data`에만 있기 때문입니다.
 이는 이름 조회 범위의 결과이며 DB 비밀번호 인증이나 SQL 성공의 증명은 아닙니다. 일반의 실제 로그인·게시판 응답과 메모 SQL 저장은 별도로 검증했습니다.
 
-**PR 개선:** 감시 API의 실제 DB 준비 상태를 healthcheck로 확인하고 화면·gateway가 API 준비를 기다리는 개선을 별도 작업 브랜치와 PR로 검토·병합합니다.
-PR 주소와 최종 결과는 완료 후 [GIT_WORK.md](GIT_WORK.md)에 기록합니다.
+**PR 개선:** 감시 API의 실제 DB 준비 상태를 healthcheck로 확인하고 화면·gateway가 API 준비를 기다리는 개선을 `codex/monitor-readiness`에서 커밋하고 [PR #1](https://github.com/RockCandy444/mini-watch-compose/pull/1)의 diff를 검토해 merge commit으로 병합했습니다.
+변경 파일·검토 의견·커밋 식별자와 병합 후 실행 결과는 [GIT_WORK.md](GIT_WORK.md)에 기록했습니다.
 
 ## 검증 재현
 
@@ -166,6 +171,7 @@ python verification/run.py recreate
 python verification/run.py network
 python verification/run.py rebuild
 python verification/run.py final
+python verification/run.py postmerge
 ```
 
 `final`은 각 컨테이너에서 기존 PostgreSQL 통합 테스트와 회원가입 프록시 테스트를 실행합니다.

@@ -1,0 +1,253 @@
+$ git rev-parse HEAD
+f2db3394f9cae376cb547773288da7fb86c3556e
+[exit 0]
+$ docker compose -f compose-monitor.yaml up -d
+ Container m5d1-monitor-monitor-api-1 Running 
+ Container m5d1-monitor-monitor-web-1 Running 
+ Container m5d1-monitor-monitor-gateway-1 Running 
+ Container m5d1-monitor-monitor-db-1 Running 
+ Container m5d1-monitor-monitor-db-1 Waiting 
+ Container m5d1-monitor-monitor-db-1 Healthy 
+ Container m5d1-monitor-monitor-api-1 Waiting 
+ Container m5d1-monitor-monitor-api-1 Healthy 
+ Container m5d1-monitor-monitor-api-1 Waiting 
+ Container m5d1-monitor-monitor-api-1 Healthy 
+[exit 0]
+HTTP 8082/api/auth/login: 200
+{"user": {"id": 1, "username": "operator"}}
+HTTP 8082/api/auth/me: 200
+{"user": {"id": 1, "username": "operator"}}
+$ docker compose -f compose-general.yaml up -d --build
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 487B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 179B done
+#4 DONE 0.0s
+
+#5 [1/9] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 58.00kB 0.0s done
+#6 DONE 0.0s
+
+#7 [2/9] WORKDIR /app
+#7 CACHED
+
+#8 [6/9] COPY general /app/general
+#8 CACHED
+
+#9 [3/9] COPY general/requirements.txt /app/general/requirements.txt
+#9 CACHED
+
+#10 [4/9] RUN pip install --no-cache-dir -r general/requirements.txt
+#10 CACHED
+
+#11 [5/9] COPY common /app/common
+#11 CACHED
+
+#12 [7/9] COPY monitor/__init__.py /app/monitor/__init__.py
+#12 CACHED
+
+#13 [8/9] COPY monitor/backend /app/monitor/backend
+#13 DONE 0.0s
+
+#14 [9/9] WORKDIR /app/general
+#14 DONE 0.1s
+
+#15 exporting to image
+#15 exporting layers 0.1s done
+#15 exporting manifest sha256:df3aeda0e9ba53004cbc49a660fc236616b2acca6415231476c20f7c9770aa19 0.0s done
+#15 exporting config sha256:02f71f6f8a56d45908496dfbfe5024617e1545f8990cd12cd4c527e6eae62831 0.0s done
+#15 exporting attestation manifest sha256:bdad8286e6377db0212c0f7be281577227d1cd0c59dce8c6efb852de15cffa0b 0.0s done
+#15 exporting manifest list sha256:1b38733ebd45bdba9943abf1ba868b8b1fa451a68bcbd305355266006296f5e4 0.0s done
+#15 naming to docker.io/library/m5d1-general-general-api:latest done
+#15 unpacking to docker.io/library/m5d1-general-general-api:latest 0.1s done
+#15 DONE 0.3s
+
+#16 resolving provenance for metadata file
+#16 DONE 0.0s
+ Image m5d1-general-general-api Building 
+ Image m5d1-general-general-api Built 
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-gateway-1 Running 
+ Container m5d1-general-general-api-1 Recreate 
+ Container m5d1-general-general-api-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-api-1 Starting 
+ Container m5d1-general-general-api-1 Started 
+[exit 0]
+$ docker compose -f compose-general.yaml up -d --force-recreate general-gateway
+ Container m5d1-general-general-db-1 Running 
+ Container m5d1-general-general-api-1 Running 
+ Container m5d1-general-general-gateway-1 Recreate 
+ Container m5d1-general-general-gateway-1 Recreated 
+ Container m5d1-general-general-db-1 Waiting 
+ Container m5d1-general-general-db-1 Healthy 
+ Container m5d1-general-general-gateway-1 Starting 
+ Container m5d1-general-general-gateway-1 Started 
+[exit 0]
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 26, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:59:58 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 25, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:59:56 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 24, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:59:54 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 23, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:58:05 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 22, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:58:03 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 21, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:58:01 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "login_success", "id": 20, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:55:12 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_success", "id": 19, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:59 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_success", "id": 18, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:50 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "http_request", "id": 17, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:54:16 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 16, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:14 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 15, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:12 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 14, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:52:50 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 13, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:48 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 12, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:46 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 7, "total": 26}}
+HTTP 8081/auth/login: 401
+{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
+HTTP 8081/auth/login: 200
+{"message": "로그인 성공 · Docker 실행", "user": {"id": 1, "username": "student"}}
+HTTP 8081/: 200
+{"html_received": 1821, "contains_board": true}
+HTTP 8082/api/events: 200
+{"events": [{"event_type": "http_request", "id": 29, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 07:04:02 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 28, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 07:04:00 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 27, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 07:03:58 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 26, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:59:58 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 25, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:59:56 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 24, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:59:54 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 23, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:58:05 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 22, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:58:03 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 21, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:58:01 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "login_success", "id": 20, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:55:12 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_success", "id": 19, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:59 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_success", "id": 18, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:50 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "http_request", "id": 17, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:54:16 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 16, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:14 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 15, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:54:12 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 14, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:52:50 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 13, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:48 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 12, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:52:46 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 11, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/static/style.css", "status_code": 304}, {"event_type": "http_request", "id": 10, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:50:39 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 9, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:24 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 8, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:50:07 GMT", "path": "/auth/login", "status_code": 401}, {"event_type": "http_request", "id": 7, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/favicon.ico", "status_code": 404}, {"event_type": "http_request", "id": 6, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/login.js", "status_code": 200}, {"event_type": "http_request", "id": 5, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/static/style.css", "status_code": 200}, {"event_type": "http_request", "id": 4, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:49 GMT", "path": "/login", "status_code": 200}, {"event_type": "http_request", "id": 3, "method": "GET", "occurred_at": "Mon, 12 Oct 2026 06:49:24 GMT", "path": "/", "status_code": 200}, {"event_type": "login_success", "id": 2, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:22 GMT", "path": "/auth/login", "status_code": 200}, {"event_type": "login_failure", "id": 1, "method": "POST", "occurred_at": "Mon, 12 Oct 2026 06:49:20 GMT", "path": "/auth/login", "status_code": 401}], "summary": {"errors": 8, "total": 29}}
+HTTP 8082/api/notes: 200
+{"notes": [{"id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}]}
+HTTP 8082/api/notes/1: 200
+{"note": {"body": "로그인 실패와 성공을 확인했다", "created_at": "Mon, 12 Oct 2026 06:51:01 GMT", "id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}}
+$ docker compose -f compose-monitor.yaml exec -T monitor-api python -c import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:5000/health'); print(r.status, r.read().decode())
+200 {"database":"ready","service":"monitor","status":"ok"}
+
+[exit 0]
+$ docker compose -f compose-monitor.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-monitor.yaml ps
+NAME                             IMAGE                                                                     COMMAND                  SERVICE           CREATED          STATUS                    PORTS
+m5d1-monitor-monitor-api-1       m5d1-monitor-monitor-api                                                  "flask --app app run…"   monitor-api       4 minutes ago    Up 4 minutes (healthy)    5000/tcp
+m5d1-monitor-monitor-db-1        postgres:16-alpine                                                        "docker-entrypoint.s…"   monitor-db        11 minutes ago   Up 11 minutes (healthy)   5432/tcp
+m5d1-monitor-monitor-gateway-1   nginx:1.28-alpine                                                         "/docker-entrypoint.…"   monitor-gateway   4 minutes ago    Up 4 minutes              127.0.0.1:8082->80/tcp
+m5d1-monitor-monitor-web-1       sha256:7a6fce00e157b4c54af7ee5d35e9b08f566c28b12b643d84a3513ee27b15b5c8   "docker-entrypoint.s…"   monitor-web       11 minutes ago   Up 11 minutes             3000/tcp
+[exit 0]
+$ docker compose -f compose-monitor.yaml logs --tail=35 monitor-api
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:02:49] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:02:53] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:02:56] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:02:59] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:02] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:06] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:09] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:12] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:15] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:18] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:22] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:25] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:28] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:31] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:34] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:38] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:41] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:03:44] "POST /api/auth/login HTTP/1.0" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:44] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:03:46] "GET /api/auth/me HTTP/1.0" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:47] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:51] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:54] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:03:56] "GET /api/events HTTP/1.0" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:03:57] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 07:03:58] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 07:04:00] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:04:00] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 07:04:02] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:04:03] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:04:04] "GET /api/events HTTP/1.0" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:04:06] "GET /api/notes HTTP/1.0" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:04:07] "GET /health HTTP/1.1" 200 -
+monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:04:08] "GET /api/notes/1 HTTP/1.0" 200 -
+monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:04:08] "GET /health HTTP/1.1" 200 -
+[exit 0]
+$ docker compose -f compose-general.yaml config --quiet
+[exit 0]
+$ docker compose -f compose-general.yaml ps
+NAME                             IMAGE                      COMMAND                  SERVICE           CREATED          STATUS                    PORTS
+m5d1-general-general-api-1       m5d1-general-general-api   "flask --app app run…"   general-api       22 seconds ago   Up 18 seconds             5000/tcp
+m5d1-general-general-db-1        postgres:16-alpine         "docker-entrypoint.s…"   general-db        11 minutes ago   Up 11 minutes (healthy)   5432/tcp
+m5d1-general-general-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   general-gateway   18 seconds ago   Up 16 seconds             127.0.0.1:8081->80/tcp
+[exit 0]
+$ docker compose -f compose-general.yaml logs --tail=35 general-api
+general-api-1  |  * Serving Flask app 'app'
+general-api-1  |  * Debug mode: off
+general-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+general-api-1  |  * Running on all addresses (0.0.0.0)
+general-api-1  |  * Running on http://127.0.0.1:5000
+general-api-1  |  * Running on http://172.21.0.3:5000
+general-api-1  | [33mPress CTRL+C to quit[0m
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 07:03:58] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
+general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 07:04:00] "POST /auth/login HTTP/1.0" 200 -
+general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
+general-api-1  | 172.25.0.3 - - [12/Oct/2026 07:04:02] "GET / HTTP/1.0" 200 -
+[exit 0]
+$ docker network inspect m5d1-events
+[
+    {
+        "Name": "m5d1-events",
+        "Id": "7d87c17eba62c89a711bd421c6b394518f2bc1dd521ed6400c00995831e60706",
+        "Created": "2026-10-12T06:46:17.994827103Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {},
+        "Containers": {
+            "11f24a4436a92372c317465838332233225b02dae640713d644d7215c6d6c22d": {
+                "Name": "m5d1-monitor-monitor-api-1",
+                "EndpointID": "6216f4adb22253f9e3fe1a83c7453ef48ab3a1450c8645a2e8ea3b87b21d3347",
+                "MacAddress": "46:46:d6:50:da:cf",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            },
+            "d847b44da4ae881aaf705639739a85a78b014a388e32afe5887505606d835e4a": {
+                "Name": "m5d1-general-general-api-1",
+                "EndpointID": "6d876634f2a58c2e6e74f1fcd38b31df00be731cdc7de9dfa2ed6c31a4751149",
+                "MacAddress": "d2:01:ef:c6:60:30",
+                "IPv4Address": "172.21.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.21.0.0/16": {
+                        "IPsInUse": 5,
+                        "DynamicIPsAvailable": 65531
+                    }
+                }
+            }
+        }
+    }
+]
+[exit 0]
+$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
+172.21.0.2      monitor-api
+[exit 0]
+PASS: merged main rebuilt; new login failure/success forwarded; original note and API DB readiness confirmed.
+PHASE PASSED: postmerge

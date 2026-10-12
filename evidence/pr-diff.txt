@@ -1,0 +1,402 @@
+diff --git a/compose-monitor.yaml b/compose-monitor.yaml
+index d25fd8e..9ba9e09 100644
+--- a/compose-monitor.yaml
++++ b/compose-monitor.yaml
+@@ -30,20 +30,32 @@ services:
+     depends_on:
+       monitor-db:
+         condition: service_healthy
++    healthcheck:
++      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2)"]
++      interval: 3s
++      timeout: 3s
++      retries: 20
++      start_period: 5s
+     networks: [monitor-web, monitor-data, events]
+   monitor-web:
+     build: ./monitor/next-frontend
+     environment:
+       HOSTNAME: 0.0.0.0
+       PORT: '3000'
+-    depends_on: [monitor-api]
++    depends_on:
++      monitor-api:
++        condition: service_healthy
+     networks: [monitor-web]
+   monitor-gateway:
+     image: nginx:1.28-alpine
+     ports: ['127.0.0.1:8082:80']
+     volumes:
+       - ./gateway/monitor.conf:/etc/nginx/conf.d/default.conf:ro
+-    depends_on: [monitor-api, monitor-web]
++    depends_on:
++      monitor-api:
++        condition: service_healthy
++      monitor-web:
++        condition: service_started
+     networks: [monitor-web]
+ networks:
+   monitor-web:
+diff --git a/evidence/final.txt b/evidence/final.txt
+new file mode 100644
+index 0000000..b870980
+--- /dev/null
++++ b/evidence/final.txt
+@@ -0,0 +1,305 @@
++HTTP 8082/api/auth/login: 200
++{"user": {"id": 1, "username": "operator"}}
++HTTP 8082/api/auth/me: 200
++{"user": {"id": 1, "username": "operator"}}
++HTTP 8081/auth/login: 401
++{"error": "아이디 또는 비밀번호가 올바르지 않습니다."}
++HTTP 8081/auth/login: 200
++{"message": "로그인 성공 · Docker 실행", "user": {"id": 1, "username": "student"}}
++HTTP 8081/: 200
++{"html_received": 1821, "contains_board": true}
++HTTP 8082/api/notes: 200
++{"notes": [{"id": 1, "status": "확인 전", "title": "Docker 점검", "updated_at": "Mon, 12 Oct 2026 06:51:01 GMT"}]}
++$ docker compose -f compose-monitor.yaml exec -T monitor-api python -m unittest discover -s tests -v
++test_failed_database_returns_503_without_details (test_health.HealthTests.test_failed_database_returns_503_without_details) ... [2026-10-12 07:00:01,210] ERROR in app: Monitor database request failed: OperationalError
++ok
++test_ready_requires_a_successful_database_query (test_health.HealthTests.test_ready_requires_a_successful_database_query) ... ok
++test_event_ingestion_filtering_summary_and_persistence (test_monitor.MonitorIntegrationTests.test_event_ingestion_filtering_summary_and_persistence) ... ok
++test_invalid_notes_preserve_database_and_form_values (test_monitor.MonitorIntegrationTests.test_invalid_notes_preserve_database_and_form_values) ... ok
++test_login_validation_hash_session_and_logout (test_monitor.MonitorIntegrationTests.test_login_validation_hash_session_and_logout) ... ok
++test_notes_crud_status_cancellation_and_persistence (test_monitor.MonitorIntegrationTests.test_notes_crud_status_cancellation_and_persistence) ... ok
++test_registration_orm_hash_duplicate_and_login (test_monitor.MonitorIntegrationTests.test_registration_orm_hash_duplicate_and_login) ... ok
++test_registration_validation_origin_and_database_failure (test_monitor.MonitorIntegrationTests.test_registration_validation_origin_and_database_failure) ... [2026-10-12 07:00:03,136] ERROR in app: Monitor database request failed: OperationalError
++ok
++test_sql_payload_is_data_repeatable_setup_and_cross_origin (test_monitor.MonitorIntegrationTests.test_sql_payload_is_data_repeatable_setup_and_cross_origin) ... ok
++test_unauthenticated_api_protection_and_forged_cookie (test_monitor.MonitorIntegrationTests.test_unauthenticated_api_protection_and_forged_cookie) ... ok
++test_fixed_destination_preserves_payload_and_success (test_signup_proxy.SignupProxyTests.test_fixed_destination_preserves_payload_and_success) ... ok
++test_forbidden_origin_never_forwarded (test_signup_proxy.SignupProxyTests.test_forbidden_origin_never_forwarded) ... ok
++test_general_errors_and_unavailability (test_signup_proxy.SignupProxyTests.test_general_errors_and_unavailability) ... ok
++test_other_general_paths_are_not_proxy_endpoints (test_signup_proxy.SignupProxyTests.test_other_general_paths_are_not_proxy_endpoints) ... ok
++
++----------------------------------------------------------------------
++Ran 14 tests in 2.313s
++
++OK
++[exit 0]
++$ docker compose -f compose-general.yaml exec -T general-api python -m unittest discover -s tests -v
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "GET", "path": "/board/999999", "status_code": 404}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "GET", "path": "/board/1", "status_code": 200}
++{"method": "GET", "path": "/board/1", "status_code": 200}
++{"method": "GET", "path": "/board/1", "status_code": 200}
++{"method": "GET", "path": "/posts/1", "status_code": 200}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "GET", "path": "/board/1/delete", "status_code": 200}
++{"method": "GET", "path": "/board/1", "status_code": 200}
++{"method": "POST", "path": "/board/1/delete", "status_code": 303}
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "GET", "path": "/board/1", "status_code": 404}
++{"method": "GET", "path": "/board/1/edit", "status_code": 404}
++{"method": "POST", "path": "/board/1/edit", "status_code": 404}
++{"method": "GET", "path": "/board/1/delete", "status_code": 404}
++{"method": "POST", "path": "/board/1/delete", "status_code": 404}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "GET", "path": "/board/1/edit", "status_code": 200}
++{"method": "POST", "path": "/board/1/edit", "status_code": 400}
++{"method": "POST", "path": "/board/1/edit", "status_code": 400}
++{"method": "POST", "path": "/board/1/edit", "status_code": 400}
++{"method": "POST", "path": "/board/1/edit", "status_code": 303}
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "GET", "path": "/board/1", "status_code": 200}
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "GET", "path": "/login", "status_code": 200}
++{"method": "POST", "path": "/auth/login", "status_code": 400}
++{"method": "POST", "path": "/auth/login", "status_code": 401}
++{"method": "POST", "path": "/auth/login", "status_code": 200}
++{"method": "POST", "path": "/auth/register", "status_code": 201}
++{"method": "POST", "path": "/auth/register", "status_code": 409}
++{"method": "POST", "path": "/auth/login", "status_code": 200}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 400}
++{"method": "POST", "path": "/auth/register", "status_code": 403}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "POST", "path": "/board/new", "status_code": 400}
++{"method": "GET", "path": "/board/999999", "status_code": 404}
++{"method": "GET", "path": "/board/999999/edit", "status_code": 404}
++{"method": "POST", "path": "/board/999999/edit", "status_code": 404}
++{"method": "GET", "path": "/board/999999/delete", "status_code": 404}
++{"method": "POST", "path": "/board/999999/delete", "status_code": 404}
++{"method": "GET", "path": "/unknown-page", "status_code": 404}
++{"method": "GET", "path": "/posts/999999", "status_code": 404}
++{"method": "GET", "path": "/", "status_code": 200}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++{"method": "POST", "path": "/board/new", "status_code": 303}
++test_actual_monitor_receives_request_json (test_posts.PostsIntegrationTests.test_actual_monitor_receives_request_json) ... 127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_create_trim_refresh_escape_and_persistence (test_posts.PostsIntegrationTests.test_create_trim_refresh_escape_and_persistence) ... 127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_delete_get_cancel_post_and_all_missing_routes (test_posts.PostsIntegrationTests.test_delete_get_cancel_post_and_all_missing_routes) ... 127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:05] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_edit_prefill_invalid_and_only_target_update (test_posts.PostsIntegrationTests.test_edit_prefill_invalid_and_only_target_update) ... 127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_empty_and_ordered_list_links (test_posts.PostsIntegrationTests.test_empty_and_ordered_list_links) ... 127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_existing_login_api_and_page (test_posts.PostsIntegrationTests.test_existing_login_api_and_page) ... 127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:06] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_general_registration_hash_duplicate_and_login (test_posts.PostsIntegrationTests.test_general_registration_hash_duplicate_and_login) ... 127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_general_registration_invalid_payload_and_origin (test_posts.PostsIntegrationTests.test_general_registration_invalid_payload_and_origin) ... 127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_invalid_create_preserves_values_and_database (test_posts.PostsIntegrationTests.test_invalid_create_preserves_values_and_database) ... 127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_missing_posts_and_generic_404 (test_posts.PostsIntegrationTests.test_missing_posts_and_generic_404) ... 127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:07] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++test_monitor_failure_does_not_break_board (test_posts.PostsIntegrationTests.test_monitor_failure_does_not_break_board) ... [2026-10-12 07:00:08,021] WARNING in request_logging: 감시 서비스에 요청 기록을 보내지 못했습니다.
++ok
++test_sql_input_is_data_and_prepare_is_repeatable (test_posts.PostsIntegrationTests.test_sql_input_is_data_and_prepare_is_repeatable) ... 127.0.0.1 - - [12/Oct/2026 07:00:08] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++127.0.0.1 - - [12/Oct/2026 07:00:08] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++ok
++
++----------------------------------------------------------------------
++Ran 12 tests in 3.818s
++
++OK
++[exit 0]
++$ docker compose -f compose-monitor.yaml config --quiet
++[exit 0]
++$ docker compose -f compose-monitor.yaml ps
++NAME                             IMAGE                                                                     COMMAND                  SERVICE           CREATED          STATUS                    PORTS
++m5d1-monitor-monitor-api-1       m5d1-monitor-monitor-api                                                  "flask --app app run…"   monitor-api       35 seconds ago   Up 30 seconds (healthy)   5000/tcp
++m5d1-monitor-monitor-db-1        postgres:16-alpine                                                        "docker-entrypoint.s…"   monitor-db        7 minutes ago    Up 7 minutes (healthy)    5432/tcp
++m5d1-monitor-monitor-gateway-1   nginx:1.28-alpine                                                         "/docker-entrypoint.…"   monitor-gateway   24 seconds ago   Up 22 seconds             127.0.0.1:8082->80/tcp
++m5d1-monitor-monitor-web-1       sha256:7a6fce00e157b4c54af7ee5d35e9b08f566c28b12b643d84a3513ee27b15b5c8   "docker-entrypoint.s…"   monitor-web       7 minutes ago    Up 7 minutes              3000/tcp
++[exit 0]
++$ docker compose -f compose-monitor.yaml logs --tail=35 monitor-api
++monitor-api-1  |  * Serving Flask app 'app'
++monitor-api-1  |  * Debug mode: off
++monitor-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
++monitor-api-1  |  * Running on all addresses (0.0.0.0)
++monitor-api-1  |  * Running on http://127.0.0.1:5000
++monitor-api-1  |  * Running on http://172.21.0.2:5000
++monitor-api-1  | [33mPress CTRL+C to quit[0m
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 06:59:43] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 06:59:47] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:59:49] "POST /api/auth/login HTTP/1.0" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 06:59:50] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 06:59:51] "GET /api/auth/me HTTP/1.0" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 06:59:53] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:59:54] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:59:56] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 06:59:56] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 172.21.0.3 - - [12/Oct/2026 06:59:58] "[35m[1mPOST /api/events HTTP/1.1[0m" 201 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:00:00] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 172.22.0.4 - - [12/Oct/2026 07:00:00] "GET /api/notes HTTP/1.0" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:00:03] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:00:06] "GET /health HTTP/1.1" 200 -
++monitor-api-1  | 127.0.0.1 - - [12/Oct/2026 07:00:09] "GET /health HTTP/1.1" 200 -
++[exit 0]
++$ docker compose -f compose-general.yaml config --quiet
++[exit 0]
++$ docker compose -f compose-general.yaml ps
++NAME                             IMAGE                      COMMAND                  SERVICE           CREATED         STATUS                   PORTS
++m5d1-general-general-api-1       m5d1-general-general-api   "flask --app app run…"   general-api       5 minutes ago   Up 5 minutes             5000/tcp
++m5d1-general-general-db-1        postgres:16-alpine         "docker-entrypoint.s…"   general-db        7 minutes ago   Up 7 minutes (healthy)   5432/tcp
++m5d1-general-general-gateway-1   nginx:1.28-alpine          "/docker-entrypoint.…"   general-gateway   5 minutes ago   Up 5 minutes             127.0.0.1:8081->80/tcp
++[exit 0]
++$ docker compose -f compose-general.yaml logs --tail=35 general-api
++general-api-1  |  * Serving Flask app 'app'
++general-api-1  |  * Debug mode: off
++general-api-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
++general-api-1  |  * Running on all addresses (0.0.0.0)
++general-api-1  |  * Running on http://127.0.0.1:5000
++general-api-1  |  * Running on http://172.21.0.3:5000
++general-api-1  | [33mPress CTRL+C to quit[0m
++general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:55:12] "POST /auth/login HTTP/1.0" 200 -
++general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:58:01] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
++general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:58:03] "POST /auth/login HTTP/1.0" 200 -
++general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:58:05] "GET / HTTP/1.0" 200 -
++general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 401}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:59:54] "[31m[1mPOST /auth/login HTTP/1.0[0m" 401 -
++general-api-1  | {"method": "POST", "path": "/auth/login", "status_code": 200}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:59:56] "POST /auth/login HTTP/1.0" 200 -
++general-api-1  | {"method": "GET", "path": "/", "status_code": 200}
++general-api-1  | 172.25.0.3 - - [12/Oct/2026 06:59:58] "GET / HTTP/1.0" 200 -
++[exit 0]
++$ docker network inspect m5d1-events
++[
++    {
++        "Name": "m5d1-events",
++        "Id": "7d87c17eba62c89a711bd421c6b394518f2bc1dd521ed6400c00995831e60706",
++        "Created": "2026-10-12T06:46:17.994827103Z",
++        "Scope": "local",
++        "Driver": "bridge",
++        "EnableIPv4": true,
++        "EnableIPv6": false,
++        "IPAM": {
++            "Driver": "default",
++            "Options": {},
++            "Config": [
++                {
++                    "Subnet": "172.21.0.0/16",
++                    "Gateway": "172.21.0.1"
++                }
++            ]
++        },
++        "Internal": false,
++        "Attachable": false,
++        "Ingress": false,
++        "ConfigFrom": {
++            "Network": ""
++        },
++        "ConfigOnly": false,
++        "Options": {
++            "com.docker.network.enable_ipv4": "true",
++            "com.docker.network.enable_ipv6": "false"
++        },
++        "Labels": {},
++        "Containers": {
++            "11f24a4436a92372c317465838332233225b02dae640713d644d7215c6d6c22d": {
++                "Name": "m5d1-monitor-monitor-api-1",
++                "EndpointID": "6216f4adb22253f9e3fe1a83c7453ef48ab3a1450c8645a2e8ea3b87b21d3347",
++                "MacAddress": "46:46:d6:50:da:cf",
++                "IPv4Address": "172.21.0.2/16",
++                "IPv6Address": ""
++            },
++            "b7b6d5f08487b38e2a6d94277ed08871e9ee722d327f2a503a497c60ca72deb6": {
++                "Name": "m5d1-general-general-api-1",
++                "EndpointID": "2a928c7515d68139dee7a7e8ef668d530cd84752864cd9e55b0a224dda3b8c9d",
++                "MacAddress": "ca:f0:6a:45:b1:fd",
++                "IPv4Address": "172.21.0.3/16",
++                "IPv6Address": ""
++            }
++        },
++        "Status": {
++            "IPAM": {
++                "Subnets": {
++                    "172.21.0.0/16": {
++                        "IPsInUse": 5,
++                        "DynamicIPsAvailable": 65531
++                    }
++                }
++            }
++        }
++    }
++]
++[exit 0]
++$ docker compose -f compose-general.yaml exec -T general-api getent hosts monitor-api
++172.21.0.2      monitor-api
++[exit 0]
++PHASE PASSED: final
+diff --git a/monitor/backend/app.py b/monitor/backend/app.py
+index 0a0cec3..13b750d 100644
+--- a/monitor/backend/app.py
++++ b/monitor/backend/app.py
+@@ -12,7 +12,7 @@
+ from flask import Flask, request
+ from sqlalchemy.exc import SQLAlchemyError
+ from werkzeug.exceptions import HTTPException
+-from monitor.backend.db import setting
++from monitor.backend.db import setting, connect_db
+ from monitor.backend.routes.auth import auth_bp
+ from monitor.backend.routes.events import events_bp
+ from monitor.backend.routes.notes import notes_bp
+@@ -55,7 +55,9 @@ def general_registration():
+ 
+     @app.get('/health')
+     def health():
+-        return {'service': 'monitor', 'status': 'ok'}
++        with connect_db() as conn:
++            conn.execute('SELECT 1')
++        return {'service': 'monitor', 'status': 'ok', 'database': 'ready'}
+ 
+     @app.errorhandler(psycopg.Error)
+     @app.errorhandler(SQLAlchemyError)
+diff --git a/monitor/backend/tests/test_health.py b/monitor/backend/tests/test_health.py
+new file mode 100644
+index 0000000..a3ace60
+--- /dev/null
++++ b/monitor/backend/tests/test_health.py
+@@ -0,0 +1,22 @@
++import unittest
++from unittest.mock import patch
++import psycopg
++from monitor.backend.app import create_app
++
++
++class HealthTests(unittest.TestCase):
++    def setUp(self):
++        self.client = create_app({'TESTING': True, 'SECRET_KEY': 'test'}).test_client()
++
++    def test_ready_requires_a_successful_database_query(self):
++        with patch('monitor.backend.app.connect_db') as connection:
++            response = self.client.get('/health')
++            self.assertEqual(response.status_code, 200)
++            self.assertEqual(response.json['database'], 'ready')
++            connection.return_value.__enter__.return_value.execute.assert_called_once_with('SELECT 1')
++
++    def test_failed_database_returns_503_without_details(self):
++        with patch('monitor.backend.app.connect_db', side_effect=psycopg.OperationalError('private details')):
++            response = self.client.get('/health')
++            self.assertEqual(response.status_code, 503)
++            self.assertNotIn('private details', response.get_data(as_text=True))
