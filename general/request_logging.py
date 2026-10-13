@@ -5,6 +5,8 @@ from flask import current_app, request
 
 
 def record_request(response):
+    if request.path == "/health":
+        return response
     event = {
         "method": request.method,
         "path": request.path,
@@ -12,7 +14,9 @@ def record_request(response):
     }
     print(json.dumps(event, ensure_ascii=False), flush=True)
     try:
-        result = requests.post(current_app.config["MONITOR_URL"], json=event, timeout=0.5)
+        result = requests.post(current_app.config["MONITOR_URL"], json=event,
+                               headers={"X-Event-Token": current_app.config["EVENT_TOKEN"]},
+                               timeout=(3, 10))
         result.raise_for_status()
     except requests.RequestException:
         current_app.logger.warning("감시 서비스에 요청 기록을 보내지 못했습니다.")

@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from repositories.users import find_user, create_user
 from common.registration import allowed_origin, validate_registration
+
+from auth_helpers import api_access_error, current_user, csrf_token
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -37,10 +39,30 @@ def login():
         return {"error": "아이디와 비밀번호를 문자열로 보내 주세요."}, 400
     if not username.strip() or not password.strip():
         return {"error": "아이디와 비밀번호를 모두 입력해 주세요."}, 400
+    session.clear()
     user = find_user(username.strip())
     if user is None or not check_password_hash(user["password_hash"], password):
         return {"error": "아이디 또는 비밀번호가 올바르지 않습니다."}, 401
+    session["user_id"] = user["id"]
     return {
-        "message": "로그인 성공 · Docker 실행",
+        "csrf_token": csrf_token(),
+        "message": "로그인 성공",
         "user": {"id": user["id"], "username": user["username"]},
     }
+
+
+@auth_bp.get("/auth/me")
+def me():
+    user = current_user()
+    if user is None:
+        return {"error": "로그인이 필요합니다."}, 401
+    return {"user": user, "csrf_token": csrf_token()}
+
+
+@auth_bp.post("/auth/logout")
+def logout():
+    error = api_access_error()
+    if error:
+        return error
+    session.clear()
+    return {"message": "로그아웃했습니다."}

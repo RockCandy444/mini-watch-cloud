@@ -25,3 +25,9 @@ def create_user(username, password_hash):
         if getattr(error.orig, "sqlstate", None) == "23505":
             return None
         raise
+
+
+def find_user_by_id(user_id):
+    with session_scope() as session:
+        user = session.get(User, user_id)
+        return None if user is None else {"id": user.id, "username": user.username}

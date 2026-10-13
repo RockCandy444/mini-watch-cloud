@@ -7,7 +7,7 @@ class Base(DeclarativeBase):
 
 
 class MonitorUser(Base):
-    __tablename__ = "monitor_users"
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, Identity(always=True), primary_key=True)
     username: Mapped[str] = mapped_column(Text, unique=True, nullable=False)

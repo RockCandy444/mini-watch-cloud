@@ -11,3 +11,8 @@ test-results/
 .local/
 out/
 dist/
+
+day2-materials/
+*.db
+*.sqlite*
+*.log

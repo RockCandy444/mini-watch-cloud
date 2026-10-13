@@ -13,7 +13,7 @@ orm_engine = create_engine(
     URL.create("postgresql+psycopg", username=os.environ.get("DB_USER", "postgres"),
                password=os.environ.get("DB_PASSWORD"), host=os.environ.get("DB_HOST", "127.0.0.1"),
                port=int(os.environ.get("DB_PORT", "5432")), database=os.environ.get("DB_NAME", "general_db")),
-    pool_pre_ping=True, connect_args={"connect_timeout": 3}, hide_parameters=True,
+    pool_pre_ping=True, connect_args={"connect_timeout": 3, "sslmode": os.environ.get("DB_SSLMODE", "prefer")}, hide_parameters=True,
 )
 session_scope = sessionmaker(orm_engine).begin
 
@@ -26,5 +26,6 @@ def connect_db():
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
         connect_timeout=3,
+        sslmode=os.environ.get("DB_SSLMODE", "prefer"),
         row_factory=dict_row,
     )

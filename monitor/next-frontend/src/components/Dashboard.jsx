@@ -58,7 +58,7 @@ export default function Dashboard({ user, onLogout }) {
               일반 서비스<p>게시판을 열어 요청을 관찰하세요.</p>
             </div>
             <a
-              href="http://localhost:8081"
+              href={process.env.NEXT_PUBLIC_GENERAL_URL || "http://localhost:8081"}
               target="_blank"
               rel="noreferrer"
               aria-label="일반 게시판 열기"

@@ -1,3 +1,4 @@
+import os
 import secrets
 import json
 import urllib.request
@@ -17,14 +18,19 @@ from monitor.backend.routes.auth import auth_bp
 from monitor.backend.routes.events import events_bp
 from monitor.backend.routes.notes import notes_bp
 from common.registration import allowed_origin
+from monitor.backend.observability import configure_errors
 
 
 def create_app(test_config=None):
+    configure_errors("mini-monitor")
     app = Flask(__name__)
     app.json.ensure_ascii = False
     app.config.from_mapping(
         SECRET_KEY=setting('SECRET_KEY') or secrets.token_hex(32),
         SESSION_COOKIE_NAME='mini_watch_monitor',
+        SESSION_COOKIE_SECURE=setting('SESSION_COOKIE_SECURE', 'false').lower() == 'true',
+        EVENT_TOKEN=setting('EVENT_TOKEN', ''),
+        GENERAL_API_URL=setting('GENERAL_API_URL', 'http://general-api:5000'),
         SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax',
         MAX_CONTENT_LENGTH=1024 * 1024,
         FRONTEND_ORIGIN=setting('FRONTEND_ORIGIN', 'http://127.0.0.1:5173'),
@@ -41,7 +47,7 @@ def create_app(test_config=None):
         if not allowed_origin():
             return {'error': '허용되지 않은 요청 출처입니다.'}, 403
         req = urllib.request.Request(
-            'http://general-api:5000/auth/register',
+            app.config['GENERAL_API_URL'].rstrip('/') + '/auth/register',
             data=json.dumps(request.get_json(silent=True)).encode(),
             headers={'Content-Type': 'application/json'},
         )
@@ -55,9 +61,8 @@ def create_app(test_config=None):
 
     @app.get('/health')
     def health():
-        with connect_db() as conn:
-            conn.execute('SELECT 1')
-        return {'service': 'monitor', 'status': 'ok', 'database': 'ready'}
+        # Liveness only; authenticated DB requests check actual database access.
+        return {'service': 'monitor', 'status': 'ok'}
 
     @app.errorhandler(psycopg.Error)
     @app.errorhandler(SQLAlchemyError)
@@ -69,10 +74,15 @@ def create_app(test_config=None):
     def http_error(error):
         return {'error': '요청을 처리할 수 없습니다.', 'status': error.code}, error.code
 
+    @app.after_request
+    def no_cache(response):
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+
     return app
 
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5200)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', '5200')))

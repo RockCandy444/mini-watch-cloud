@@ -1,4 +1,4 @@
-name: m5d1-general
+name: m5d2-general
 services:
   general-db:
     image: postgres:16-alpine
@@ -18,14 +18,18 @@ services:
     networks: [general-data]
   general-api:
     build:
-      context: .
-      dockerfile: general/Dockerfile
+      context: ./general
+      dockerfile: Dockerfile
     environment:
       DB_HOST: general-db
       DB_PORT: '5432'
       DB_NAME: general_db
       DB_USER: general
       DB_PASSWORD: classroom-general-only
+      DB_SSLMODE: disable
+      SECRET_KEY: classroom-day2-general-session-key-only
+      SESSION_COOKIE_SECURE: 'false'
+      EVENT_TOKEN: classroom-day2-event-token-only-not-for-production
       MONITOR_URL: http://monitor-api:5000/api/events
       FRONTEND_ORIGIN: http://localhost:8082
     depends_on:

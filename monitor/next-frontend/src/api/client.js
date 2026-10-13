@@ -1,3 +1,5 @@
+let csrfToken = "";
+
 export class ApiError extends Error {
   constructor(message, status) {
     super(message);
@@ -11,7 +13,7 @@ export async function request(path, options = {}, basePath = "/api") {
     response = await fetch(`${basePath}${path}`, {
       credentials: "same-origin",
       ...options,
-      headers: { "Content-Type": "application/json", ...options.headers },
+      headers: { "Content-Type": "application/json", ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}), ...options.headers },
     });
   } catch {
     throw new ApiError(
@@ -36,5 +38,7 @@ export async function request(path, options = {}, basePath = "/api") {
       response.status,
     );
   }
+  if (data.csrf_token) csrfToken = data.csrf_token;
+  if (path === "/auth/logout") csrfToken = "";
   return data;
 }

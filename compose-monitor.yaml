@@ -1,4 +1,4 @@
-name: m5d1-monitor
+name: m5d2-monitor
 services:
   monitor-db:
     image: postgres:16-alpine
@@ -17,15 +17,18 @@ services:
     networks: [monitor-data]
   monitor-api:
     build:
-      context: .
-      dockerfile: monitor/backend/Dockerfile
+      context: ./monitor/backend
+      dockerfile: Dockerfile
     environment:
       DB_HOST: monitor-db
       DB_PORT: '5432'
       DB_NAME: monitor_db
       DB_USER: monitor
       DB_PASSWORD: classroom-monitor-only
-      SECRET_KEY: classroom-compose-session-key-not-for-production
+      DB_SSLMODE: disable
+      SESSION_COOKIE_SECURE: 'false'
+      EVENT_TOKEN: classroom-day2-event-token-only-not-for-production
+      SECRET_KEY: classroom-day2-monitor-session-key-only
       FRONTEND_ORIGIN: http://localhost:8082
     depends_on:
       monitor-db:
@@ -42,6 +45,7 @@ services:
     environment:
       HOSTNAME: 0.0.0.0
       PORT: '3000'
+      MONITOR_API_URL: http://monitor-api:5000
     depends_on:
       monitor-api:
         condition: service_healthy

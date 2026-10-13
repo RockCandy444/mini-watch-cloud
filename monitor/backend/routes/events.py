@@ -1,4 +1,5 @@
-from flask import Blueprint, request
+import hmac
+from flask import Blueprint, request, current_app
 from monitor.backend.repositories import events
 from monitor.backend.routes.auth import require_login
 
@@ -24,7 +25,10 @@ def make_event(data):
 
 @events_bp.post('')
 def receive():
-    # General service ingestion stays open on loopback. Reads require login.
+    expected = current_app.config['EVENT_TOKEN']
+    token = request.headers.get('X-Event-Token', '')
+    if not expected or not hmac.compare_digest(token.encode(), expected.encode()):
+        return {'error': '기록 전송 토큰이 올바르지 않습니다.'}, 403
     event = make_event(request.get_json(silent=True))
     if event is None:
         return {'error': 'method, path, status_code를 올바르게 보내 주세요.'}, 400

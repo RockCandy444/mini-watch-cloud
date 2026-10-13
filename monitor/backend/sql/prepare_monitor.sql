@@ -1,4 +1,11 @@
-CREATE TABLE IF NOT EXISTS monitor_users (
+-- Preserve existing Day1 account IDs and hashes; no DROP/TRUNCATE.
+DO $$
+BEGIN
+    IF to_regclass('users') IS NULL AND to_regclass('monitor_users') IS NOT NULL THEN
+        ALTER TABLE monitor_users RENAME TO users;
+    END IF;
+END $$;
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL

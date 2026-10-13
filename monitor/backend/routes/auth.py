@@ -3,6 +3,7 @@ from flask import Blueprint, g, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from common.registration import allowed_origin, validate_registration
 from monitor.backend.repositories import users
+from monitor.backend.auth_helpers import csrf_token, valid_csrf
 
 auth_bp = Blueprint('monitor_auth', __name__, url_prefix='/api/auth')
 
@@ -16,6 +17,8 @@ def require_login(view):
             session.clear()
             return {'error': '로그인이 필요합니다.'}, 401
         if request.method not in ('GET', 'HEAD', 'OPTIONS'):
+            if not valid_csrf(request.headers.get('X-CSRF-Token')):
+                return {'error': '요청 확인 값이 올바르지 않습니다. 새로고침 후 다시 시도해 주세요.'}, 403
             if not allowed_origin():
                 return {'error': '허용되지 않은 요청 출처입니다.'}, 403
         return view(*args, **kwargs)
@@ -51,13 +54,13 @@ def login():
     if user is None or not check_password_hash(user['password_hash'], password):
         return {'error': '아이디 또는 비밀번호가 맞지 않습니다.'}, 401
     session['user_id'] = user['id']
-    return {'user': {'id': user['id'], 'username': user['username']}}
+    return {'user': {'id': user['id'], 'username': user['username']}, 'csrf_token': csrf_token()}
 
 
 @auth_bp.get('/me')
 @require_login
 def me():
-    return {'user': g.user}
+    return {'user': g.user, 'csrf_token': csrf_token()}
 
 
 @auth_bp.post('/logout')
