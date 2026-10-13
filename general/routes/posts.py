@@ -2,8 +2,23 @@ from flask import Blueprint, redirect, render_template, request, url_for
 
 from post_rules import validate_post
 from repositories import posts
+from auth_helpers import current_user, valid_csrf
 
 posts_bp = Blueprint("posts", __name__)
+
+
+@posts_bp.before_request
+def protect_post_changes():
+    if request.endpoint not in {"posts.new", "posts.edit", "posts.delete"}:
+        return None
+    if current_user() is None:
+        if request.method == "GET":
+            return redirect(url_for("auth.login_page"), code=303)
+        return render_template("error.html", message="게시글을 변경하려면 먼저 로그인해 주세요."), 401
+    if request.method == "POST" and not valid_csrf(
+        request.form.get("csrf_token") or request.headers.get("X-CSRF-Token")
+    ):
+        return render_template("error.html", message="요청 확인 값이 올바르지 않습니다. 새로고침 후 다시 시도해 주세요."), 403
 
 
 def missing_post():

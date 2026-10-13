@@ -99,6 +99,10 @@ class PostsIntegrationTests(unittest.TestCase):
             conn.execute('TRUNCATE http_events, users RESTART IDENTITY')
             conn.execute('INSERT INTO users (username, password_hash) VALUES (%s, %s)', ('monitor-test', generate_password_hash('test-only-password')))
         self.client = self.app.test_client()
+        with self.client.session_transaction() as login_session:
+            login_session["user_id"] = 1
+            login_session["csrf_token"] = "integration-csrf"
+        self.client.environ_base["HTTP_X_CSRF_TOKEN"] = "integration-csrf"
 
     def create(self, title="테스트 제목", body="첫째 줄\n둘째 줄"):
         response = self.client.post("/board/new", data={"title": title, "body": body})
@@ -247,6 +251,17 @@ class PostsIntegrationTests(unittest.TestCase):
         import requests
         with patch("request_logging.requests.post", side_effect=requests.ConnectionError("test-only failure")):
             self.assertEqual(self.client.get("/").status_code, 200)
+
+    def test_public_board_changes_require_login_and_csrf(self):
+        anonymous = self.app.test_client()
+        self.assertEqual(anonymous.get("/").status_code, 200)
+        self.assertEqual(anonymous.get("/board/new").status_code, 303)
+        self.assertEqual(anonymous.post("/board/new", data={"title": "x", "body": "y"}).status_code, 401)
+        self.client.environ_base.pop("HTTP_X_CSRF_TOKEN")
+        self.assertEqual(self.client.post("/board/new", data={"title": "x", "body": "y"}).status_code, 403)
+        response = self.client.get("/board/new")
+        self.assertIn('name="csrf_token"', response.get_data(as_text=True))
+        self.assertEqual(self.client.post("/board/new", data={"title": "x", "body": "y", "csrf_token": "integration-csrf"}).status_code, 303)
 
 
 if __name__ == "__main__":

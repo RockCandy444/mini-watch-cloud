@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from request_logging import register_request_logging
 from routes.auth import auth_bp
 from routes.posts import posts_bp
-from auth_helpers import configure_session, api_access_error, no_cache
+from auth_helpers import configure_session, api_access_error, no_cache, csrf_token
 from observability import configure_errors
 
 
@@ -30,6 +30,7 @@ def create_app(test_config=None):
         app.config.update(test_config)
     app.register_blueprint(posts_bp)
     app.register_blueprint(auth_bp)
+    app.context_processor(lambda: {"csrf_token": csrf_token()})
     app.after_request(no_cache)
     register_request_logging(app)
 
