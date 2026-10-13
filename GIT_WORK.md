@@ -25,4 +25,15 @@ ENABLE_SENTRY_TEST=false가 최종 예시이고 로그인 없는 접근 401·비
 재현 이미지의 오류 로그와 최종 이미지의 정상 응답을 직접 확인했다. 실제 Sentry 수신은 미확인이다.
 
 수정 후 add·commit·push, Render의 배포 SHA 확인, 같은 로그인/요청의 정상 결과 재확인, ENABLE_SENTRY_TEST=false 복구 순서로 배포한다.
-Render 배포는 아직 수행하지 않았다. Sentry Resolve만으로 코드나 배포가 바뀌지 않는다.
+Render 세 앱을 실제 배포했다. Sentry Resolve만으로 코드나 배포가 바뀌지 않는다.
+
+## 실제 클라우드 배포 후 변경
+
+| SHA | 변경 |
+| --- | --- |
+| eeb7a39ad3cb38e3e0063d04f63e9a295a1ba1fc | 일반 게시글 변경에 로그인·CSRF 보호, Next 이미지 빌드에 공개 일반 URL 주입. 일반 회귀 13개 통과 |
+| 0a07c98d592f134f39de209a433dedecb2dd9de1 | 감시 DB 접속 실패를 자격증명 없이 원인 범주로 서버 로그에 표시. 감시 회귀 14개 통과 |
+| 54c587ddbe287c8ae248ae3212eeaebea7c0c9d0 | 일반/감시 회원가입·로그인 링크를 실제 공개 HTTPS URL로 연결. Render 일반·Next에 배포 완료 |
+
+감시 API는 0a07c98, 일반·Next는 54c587d가 실제 Live임을 확인했다. 마지막 증빙·문서 커밋은 실행 코드 변경이 없다.
+실제 Render/Supabase 구성은 LIVE_DEPLOYMENT.md, HTTPS 검증은 verification/public-results.md와 public-events.jpg·public-note.jpg에 기록한다.

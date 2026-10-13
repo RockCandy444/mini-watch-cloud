@@ -1,15 +1,15 @@
 # 과제 54 체크리스트: 필수 20 / 선택 4
 
 [과제 원문](https://classroom.codemit.kr/classes/5/problems/54/submit)의 코드·설정·문서 평가 기준에 대응한다.
-완료 표시는 구현과 local 검증 기준이며 실제 Render·Supabase·Sentry 원격 배포 완료를 뜻하지 않는다.
-진행 상태는 [deployment-plan.md](deployment-plan.md)에 명시했다. Classroom 채점을 대신하는 자체 결과로 표시하지 않는다.
+완료 표시는 구현과 검증 기준이다. Render·Supabase 실제 배포와 기능 검증도 완료했으며, 실제 Sentry 수신은 아직 설정하지 않았다.
+진행 상태는 [LIVE_DEPLOYMENT.md](LIVE_DEPLOYMENT.md)와 [deployment-plan.md](deployment-plan.md)에 명시했다. Classroom 채점을 대신하는 자체 결과로 표시하지 않는다.
 
 | 필수 | 확인 | 실제 파일·근거 |
 | --- | --- | --- |
 | 1. 세 앱 소스·의존성·역할과 변경 설명 | [x] | general/, monitor/backend/, monitor/next-frontend/ 및 requirements.txt·package.json/lock, README의 앱 역할·변경 표 |
 | 2. 두 Flask Dockerfile·Waitress·0.0.0.0·PORT·같은 app | [x] | 앱별 Dockerfile의 pip/COPY 및 waitress-serve app:app, 개발용 app.py 유지. 두 이미지 실제 빌드·Waitress 실행 |
 | 3. Next 설치·production build·서버 실행·빌드 외부 요청 불필요 | [x] | npm ci → npm run build → npm run start, start=next start. env 없는 host/Docker build 성공, Route Handler 요청 때 API 접속 |
-| 4. 앱별 Root·Dockerfile·브랜치·Health와 무료 Render 설정 | [x] | deployment-plan.md의 세 앱 Render 표, Hobby/Free·context .·Command 빈칸·On Commit |
+| 4. 앱별 Root·Dockerfile·브랜치·Health와 무료 Render 설정 | [x] | deployment-plan.md·LIVE_DEPLOYMENT.md의 실제 Free·context .·Command 빈칸·수동 배포 및 On Commit 권장 구분 |
 | 5. 두 Flask /health와 DB 확인 구분 | [x] | 두 app.py의 /health, monitor health 회귀 테스트, 문서의 liveness와 실제 DB 조회 구분 |
 | 6. DB 환경 변수 6개 일치 | [x] | 각 db.py의 DB_HOST·PORT·NAME·USER·PASSWORD·SSLMODE. psycopg와 SQLAlchemy 모두 SSL 적용, 각 예시·문서 대응 |
 | 7. 별도 Supabase 프로젝트·Session pooler | [x] | 각 .env.example·배포 계획의 일반 샘플/감시 별도 프로젝트, Host/User 대응, 5432·postgres·require |
@@ -25,7 +25,7 @@
 | 17. 두 Flask Sentry SDK·앱 시작 env 초기화 | [x] | requirements sentry-sdk[flask], observability.py, create_app()에서 configure_errors. app:app import에도 실행. DSN/env/version을 환경에서 읽음 |
 | 18. 정상 sentry-test·로그인·flag·최종 false | [x] | general/app.py sentry_test() 1/1 정상 JSON, api_access_error/flag 유지. 예시 false. 실제 404·401·500→200 검증 |
 | 19. 주소 흐름·local Compose·커밋/push/배포 확인·경로 비활성 | [x] | deployment-plan.md 요청 흐름·Compose 차이·배포 SHA 점검·동일 요청 확인 후 false 복구 절차 |
-| 20. 이번/오류 수정 SHA·파일·원인·수정 일치 | [x] | README·배포 계획·GIT_WORK.md, 6d14279→979f7da 및 verification/sentry-fix.diff. URL·수신 증빙을 완료라고 표시하지 않음 |
+| 20. 이번/오류 수정 SHA·파일·원인·수정 일치 | [x] | README·배포 계획·GIT_WORK.md, 6d14279→979f7da 및 verification/sentry-fix.diff. 실제 배포 URL·검증과 Sentry 수신 미확인을 구분 |
 
 | 선택 | 확인 | 실제 파일·근거 |
 | --- | --- | --- |
@@ -34,5 +34,5 @@
 | 3. Sentry 본문·쿠키·헤더·사용자 정보 제외·설명 | [x] | 두 observability.py before_send·send_default_pii·include_local_variables·max_request_body_size, 선택 3 설명·검증 |
 | 4. 수정 전후 SHA·diff·효과·기존 기능 유지 | [x] | 배포 계획 선택 4, 두 실제 SHA·sentry-fix.diff·보호/회귀 검증. 1/0→1/1 외 기존 경로·SDK 유지 |
 
-실제 검증 요약: [verification/cloud-results.md](verification/cloud-results.md).
+검증 요약: [로컬 결과](verification/cloud-results.md), [실제 배포 결과](verification/public-results.md).
 이전 Day1 evidence/와 기능 가이드는 과거 참고 자료다.

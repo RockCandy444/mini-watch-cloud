@@ -1,6 +1,7 @@
 # Day2 local validation
 
-Date: 2026-10-13 (Asia/Seoul). External cloud services were not deployed.
+Date: 2026-10-13 (Asia/Seoul). This is the original local validation, before external cloud deployment.
+Subsequent actual Render/Supabase results: [public-results.md](public-results.md). Deployment settings: [LIVE_DEPLOYMENT.md](../LIVE_DEPLOYMENT.md).
 
 - Both Compose configs pass; general /health=200; Next blocks browser event ingestion; anonymous monitor /me=401.
 - General failed/successful logins return 401/200; Next forwards Set-Cookie, Cookie, login status and CSRF token.
@@ -15,6 +16,7 @@ Date: 2026-10-13 (Asia/Seoul). External cloud services were not deployed.
 - All three app-level Docker build contexts succeeded. Flask images ran the final application with Waitress.
 - Next.js 16.4.0 production builds succeeded both on the host and in Docker with no MONITOR_API_URL or database settings.
 - General real-PostgreSQL regression suite: 12 tests passed, disposable schema removed after testing.
+- After adding authenticated/CSRF-protected post mutations for public deployment, the updated general suite passed 13 tests in a disposable schema.
 - Monitor real-PostgreSQL, signup proxy and health suite: 14 tests passed, disposable schema removed after testing.
 - Sentry contract suite: 2 tests passed in the final general image. Disabled endpoint=404, anonymous=401, authenticated enabled endpoint=200/result 1.0. Privacy filter and SDK options validated without contacting Sentry.
 - Exercise image from commit 6d14279 reproduced ZeroDivisionError/500 under the same authenticated/feature-enabled conditions. Final fix is commit 979f7da.

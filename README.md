@@ -15,9 +15,11 @@ Classroom 제출은 사용자가 직접 한다.
 기존 게시글·로그인·회원가입·기록·메모·화면 디자인과 두 Compose 및 gateway를 유지했다.
 각 앱 이미지가 루트 밖 공통 파일에 의존하지 않도록 common/registration.py의 사본도 각 Flask 폴더에 포함했다.
 
-**클라우드 상태는 세 앱 모두 미배포**다. 실제 Render URL·Supabase 접속·Sentry 수신을 완료했다고 주장하지 않는다.
-과제의 코드·설정·README 평가 범위는 구현했고 실제 Docker 이미지와 두 로컬 PostgreSQL에서 검증했다.
-배포 Root Directory·Dockerfile·무료 설정·연결 주소·계정 준비·오류 재확인 절차는 배포 계획에 있다.
+**세 앱을 Render Free에 배포하고 서로 다른 Supabase 프로젝트에 연결했다.**
+일반 게시판은 [일반 앱](https://rockcandy-mini-general.onrender.com), 기록·메모는 [감시 대시보드](https://rockcandy-mini-monitor-web.onrender.com)에서 사용할 수 있다.
+화면의 회원가입으로 본인 계정을 만든다. 일반 계정과 감시 계정은 각각 준비한다.
+실제 서비스·DB 권한·무료 설정은 [LIVE_DEPLOYMENT.md](LIVE_DEPLOYMENT.md), 원격 검증은 [public-results.md](verification/public-results.md)에 기록했다.
+로그인·게시글·메모·실패/성공 기록의 실제 저장과 조회를 확인했다. Sentry SDK는 연결했지만 DSN과 대시보드 수신은 아직 설정하지 않았다.
 
 ## 로컬 실행
 
@@ -58,7 +60,7 @@ docker compose -f compose-monitor.yaml down
 ## 검증과 이번 커밋
 
 2026-10-13 (Asia/Seoul)에 세 이미지를 빌드했다. 외부 API·DB 설정이 없는 Next production build도 성공했다.
-일반 PostgreSQL 통합 테스트 12개·감시 통합/프록시/health 14개·Sentry 보호/정보 제외 2개가 통과했다.
+일반 PostgreSQL 통합 테스트 13개·감시 통합/프록시/health 14개·Sentry 보호/정보 제외 2개가 통과했다.
 [HTTP smoke](verification/cloud-smoke.cjs)는 두 DB의 게시글·메모 CRUD, 로그인 실패/성공 분류, 쿠키·CSRF,
 일곱 컨테이너 재생성 후 자료·세션 유지, 감시 API 중지의 502와 복구 후 200을 확인했다.
 [실제 결과 요약](verification/cloud-results.md)에는 확인 범위만 기록했다.
@@ -67,6 +69,8 @@ Node.js 22 이상에서 fixture 검증을 반복할 수 있다. 스크립트는 
 
 ```powershell
 node verification/cloud-smoke.cjs
+# 실제 배포: 독립 테스트 계정·자기 게시글/메모로 검증
+node verification/public-smoke.cjs
 # 임시 DB 스키마에서 기존 회귀 검증:
 ./verification/run-regressions.ps1
 ```
@@ -81,6 +85,8 @@ node verification/cloud-smoke.cjs
 오류 원인·수정 효과·보호 조건과 [실제 diff](verification/sentry-fix.diff), 잠시 true로 확인 후 false로 끄는 절차를 배포 계획에 포함했다.
 Sentry는 개발·Waitress 실행에 모두 연결되며 Resolve가 코드 수정·재배포를 대신하지 않는다.
 실제 .env·비밀번호·토큰·DSN·node_modules·.next·가상환경·DB 파일은 Git/Docker에 넣지 않는다.
-기존 evidence/·과거 기능 가이드는 Day1 참고이며 이번 결과는 verification/cloud-results.md가 기준이다.
+기존 evidence/·과거 기능 가이드는 Day1 참고이며 로컬 결과는 verification/cloud-results.md, 실제 배포 결과는 verification/public-results.md가 기준이다.
+
+![실제 배포 화면의 로그인 실패·성공 기록](verification/public-events.jpg)
 
 제출 저장소: **https://github.com/RockCandy444/mini-watch-cloud**

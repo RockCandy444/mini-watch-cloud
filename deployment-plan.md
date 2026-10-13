@@ -11,11 +11,10 @@
 공식 `zeroskill2400/mini-watch`의 `day07-cloud-materials`에서 `day2-materials/project-support/starter`를 가져와 비교했다.
 기존 앱을 덮어쓰지 않고 Sentry 초기화·일반 세션 도우미·Next 프록시를 실제 앱에 적용했다.
 
-**세 앱 모두 클라우드 미배포**이다. Render URL·Supabase 연결값·Sentry DSN을 확보하거나 원격 프로젝트를 생성하지 않았다.
-Supabase 실제 접속, Render 재배포, Sentry 대시보드 오류 수신은 확인하지 않았다.
-과제는 코드·설정·문서를 평가하며 실제 URL 접속이나 Sentry 수신을 필수로 요구하지 않는다.
-이번 검증은 실제 Docker 이미지·별도 PostgreSQL 두 개·Next→Flask 요청·회귀 테스트·로컬 컨테이너 재생성이다.
-로컬 DB 성공을 Supabase 접속 성공으로 표시하지 않는다.
+**세 앱을 Render Free에 배포했다.** 실제 Supabase 접속·회원가입·로그인·게시글/메모 CRUD·감시 기록 저장을 확인했다.
+서비스와 프로젝트·권한은 [LIVE_DEPLOYMENT.md](LIVE_DEPLOYMENT.md), 공개 HTTPS 기능 검증은 [verification/public-results.md](verification/public-results.md)에 기록했다.
+로컬 Docker·두 PostgreSQL·회귀 테스트·컨테이너 재생성 결과도 별도로 보존한다.
+Sentry DSN은 아직 설정하지 않아 실제 Sentry 대시보드 수신은 미확인이다.
 
 ## Render 무료 Docker 설정
 
@@ -23,9 +22,11 @@ Render Hobby workspace / Free instance, Supabase Free, Sentry Developer 범위�
 
 | 앱 / 역할 | Root Directory | Dockerfile Path | Build Context | Docker Command | Health Check | 배포 브랜치 | Auto-Deploy | 상태 / 실제 URL |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 감시 API / 로그인·기록·메모 | `monitor/backend` | `./Dockerfile` | `.` | 빈칸 | `/health` | `day2-deploy` | On Commit | 미배포 / 없음 |
-| 일반 앱 / 로그인·게시글·기록 전송 | `general` | `./Dockerfile` | `.` | 빈칸 | `/health` | `day2-deploy` | On Commit | 미배포 / 없음 |
-| 감시 화면 / Next 화면·프록시 | `monitor/next-frontend` | `./Dockerfile` | `.` | 빈칸 | `/` | `day2-deploy` | On Commit | 미배포 / 없음 |
+| 감시 API / 로그인·기록·메모 | `monitor/backend` | `./Dockerfile` | `.` | 빈칸 | `/health` | `day2-deploy` | 수동 | https://rockcandy-mini-monitor-api.onrender.com |
+| 일반 앱 / 로그인·게시글·기록 전송 | `general` | `./Dockerfile` | `.` | 빈칸 | `/health` | `day2-deploy` | 수동 | https://rockcandy-mini-general.onrender.com |
+| 감시 화면 / Next 화면·프록시 | `monitor/next-frontend` | `./Dockerfile` | `.` | 빈칸 | `/` | `day2-deploy` | 수동 | https://rockcandy-mini-monitor-web.onrender.com |
+
+현재 Public Git Repository 연결은 Manual Deploy → Deploy latest commit으로 배포한다. GitHub 연동을 통한 On Commit은 이후 자동 배포를 위한 권장 설정이다.
 
 감시 API → 일반 → Next 순서로 설정한다. Docker Command는 Dockerfile CMD를 쓰므로 비운다.
 두 Flask는 `waitress-serve --host=0.0.0.0 --port=$PORT app:app`로 같은 전역 `app`을 읽는다.
@@ -43,13 +44,14 @@ start는 `next start --hostname 0.0.0.0`이다. 기존 build-time rewrite를 제
 
 | 앱 | Supabase 프로젝트 계획 | Session pooler | SQL / 테이블 |
 | --- | --- | --- | --- |
-| 일반 | 2·3교시 샘플을 일반용으로 재사용 | 그 프로젝트 Host, User `postgres.<GENERAL_PROJECT_REF>`, 5432 / postgres / require | `general/sql/deploy.sql`: users(id, username, password_hash), posts(id, title, body) |
-| 감시 | 감시용 별도 Free 프로젝트 | 감시 프로젝트 Host, User `postgres.<MONITOR_PROJECT_REF>`, 5432 / postgres / require | `monitor/backend/sql/deploy.sql`: users, http_events, notes |
+| 일반 | 기존 RockCandy444's Project 재사용 | Connect에서 확인한 Host, User `mini_general_app.<GENERAL_PROJECT_REF>`, 5432 / postgres / require | `general/sql/deploy.sql`: users(id, username, password_hash), posts(id, title, body) |
+| 감시 | 새 mini-watch-monitor Free 프로젝트 | Connect에서 확인한 Host, User `mini_monitor_app.<MONITOR_PROJECT_REF>`, 5432 / postgres / require | `monitor/backend/sql/deploy.sql`: users, http_events, notes |
 
 Host는 지역명을 조합하지 않고 각 프로젝트 Connect → Session pooler에서 복사한다.
 두 DB 이름이 `postgres`여도 다른 프로젝트다. `DB_SSLMODE=require`로 SSL을 사용하고 transaction pooler 6543은 사용하지 않는다.
-수업 구성에 따라 Data API를 끄고 Flask가 PostgreSQL에 직접 접속하도록 준비한다. 별도 RLS 정책은 추가하지 않는다.
-이 원격 프로젝트 설정은 아직 실행하지 않은 절차다. 각 SQL Editor에 대응 deploy.sql을 적용한다.
+새 감시 프로젝트는 Data API를 끄고 Flask가 PostgreSQL에 직접 접속한다. 기존 일반 프로젝트의 Data API와 기존 notes 데이터·정책은 보존했다.
+각 SQL Editor에 대응 deploy.sql을 적용하고, 새 앱 테이블에 RLS 및 서버 전용 역할 정책을 추가했다.
+서버 전용 계정은 자기 앱 테이블·시퀀스에만 접근한다. 실제 Host·User 및 검증한 권한은 LIVE_DEPLOYMENT.md에 기록했다.
 
 두 앱의 psycopg CRUD와 SQLAlchemy 로그인·회원가입 모두 환경 DB 값과 SSL을 읽는다.
 감시의 과거 monitor_users가 있고 users가 없으면 SQL은 테이블 이름만 변경해 ID·해시를 보존하고, 처음 설치면 users를 생성한다.
@@ -174,7 +176,7 @@ service tag/environment로 mini-general·mini-monitor를 구분한다. 빈 DSN�
 
 위 전후 SHA와 sentry-fix.diff의 핵심은 `result = 1 / 0` → `result = 1 / 1`로 활성·로그인 요청을 500에서 200으로 바꾸는 것이다.
 로그인 gate·실습 flag·SDK 초기화·게시글·감시 기능은 diff에서 제거하지 않는다.
-기존 일반 12개·감시 14개 회귀 테스트와 Sentry 2개, HTTP smoke 검증을 통과했다.
+일반 13개·감시 14개 회귀 테스트와 Sentry 2개, 로컬 및 공개 HTTPS smoke 검증을 통과했다.
 실제 결과는 [verification/cloud-results.md](verification/cloud-results.md), 항목 대응은 [CHECKLIST.md](CHECKLIST.md)에 있다.
 
 ## 참고
