@@ -44,8 +44,8 @@ def create_app(test_config=None):
         error = api_access_error()
         if error:
             return error
-        # Day2 exercise: this deliberate error is fixed in the next commit.
-        result = 1 / 0
+        # The exercise is complete: keep the login/feature guards and return JSON.
+        result = 1 / 1
         return {"result": result}
 
     @app.errorhandler(psycopg.Error)
