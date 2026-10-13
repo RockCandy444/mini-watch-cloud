@@ -67,7 +67,24 @@ def create_app(test_config=None):
     @app.errorhandler(psycopg.Error)
     @app.errorhandler(SQLAlchemyError)
     def database_error(error):
-        app.logger.error('Monitor database request failed: %s', type(error).__name__)
+        # Classify connection failures without logging credentials or SQL values.
+        cause = getattr(error, 'orig', error)
+        message = str(cause).lower()
+        category = 'database_error'
+        for text, label in (
+            ('password authentication failed', 'authentication'),
+            ('tenant or user not found', 'pooler_identity'),
+            ('could not translate host name', 'dns'),
+            ('connection refused', 'connection_refused'),
+            ('timeout', 'connection_timeout'),
+            ('certificate', 'tls'),
+            ('permission denied', 'permissions'),
+            ('does not exist', 'schema'),
+        ):
+            if text in message:
+                category = label
+                break
+        app.logger.error('Monitor database request failed: %s (%s)', type(error).__name__, category)
         return {'error': 'DB에 연결하지 못했습니다. DB 설정과 준비 상태를 확인해 주세요.'}, 503
 
     @app.errorhandler(HTTPException)
