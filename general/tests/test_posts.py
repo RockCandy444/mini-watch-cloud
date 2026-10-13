@@ -96,8 +96,8 @@ class PostsIntegrationTests(unittest.TestCase):
         with self.test_connection() as conn:
             conn.execute("TRUNCATE TABLE posts, users RESTART IDENTITY")
         with self.test_connection() as conn:
-            conn.execute('TRUNCATE http_events, monitor_users RESTART IDENTITY')
-            conn.execute('INSERT INTO monitor_users (username, password_hash) VALUES (%s, %s)', ('monitor-test', generate_password_hash('test-only-password')))
+            conn.execute('TRUNCATE http_events, users RESTART IDENTITY')
+            conn.execute('INSERT INTO users (username, password_hash) VALUES (%s, %s)', ('monitor-test', generate_password_hash('test-only-password')))
         self.client = self.app.test_client()
 
     def create(self, title="테스트 제목", body="첫째 줄\n둘째 줄"):

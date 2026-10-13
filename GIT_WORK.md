@@ -1,67 +1,28 @@
-# Docker 적용 Git 기록과 PR 검토
+# Day2 Git 변경 기록
 
-모든 과제 소스와 실행 증거를 본인 공개 저장소의 `main`에 push했습니다.
-강의실 제출은 사용자가 직접 진행합니다.
+저장소 https://github.com/RockCandy444/mini-watch-cloud, 작업·배포 브랜치 day2-deploy.
+최종 파일은 main에도 동일하게 반영하여 GitHub 기본 브랜치로 제출할 수 있게 한다.
+원래 mini-watch-compose 저장소는 수정하지 않았다. 기존 파일·이력의 별도 사본에서 이어 작업했다.
 
-| 커밋 | 직접 작업한 변경 |
+| SHA | 변경 |
 | --- | --- |
-| `95bf25128cfe80248da14a4cc8b0575c07c52ba9` | 기존 앱을 이어 사용해 두 Compose, Flask·Next.js Dockerfile, 빌드 제외 설정, 초기 SQL·볼륨, Nginx, 계정 준비 옵션, 실제 실행·화면·데이터 보존 증거 추가 |
-| `113a708` | 일반 로그인 응답 문구 변경과 restart/rebuild 비교, 공유 망 분리·복구·DB 망 분리 실험, README와 실제 결과 추가 |
-| `80f008a888a02d7aa54ed0897425a0f0f2b47a42` | 작업 브랜치에서 감시 API의 SELECT 1 준비 확인·Compose healthcheck·화면/gateway 대기, 정상·DB 실패 테스트와 실제 실행 증거 추가 |
-| `c52c8f827122ae96346da9beb74780da9805c457` | PR 실행 로그의 줄바꿈 정리 |
-| `f2db3394f9cae376cb547773288da7fb86c3556e` | PR #1의 merge commit으로 개선을 main에 병합 |
+| 2e4b61d | Day1 기존 Compose·게시글·감시 기능 완료 상태. 시작 기준 |
+| 192144ba4e564d671e756d2a5948a3f70f032cf0 | 세 앱 Dockerfile의 앱별 context와 PORT 실행, DB_SSLMODE, 일반 세션, 두 서버 이벤트 토큰, 감시 users 보존 이행, CSRF, 두 Sentry 초기화, Next Route Handler와 production 서버 실행 적용. 일반 실습 오류 재현 상태 포함 |
+| 853988babef60cd36316058c26ea78f5d3aab7f4 | general/app.py의 sentry_test() 분모 0을 1로 수정. flag와 로그인 검사 유지. verification/test_sentry.py로 404·401·500→200 및 정보 제외 확인 |
 
-원래 앱의 시작 커밋은 `next-notes-collaboration`의 `10eb5572eaa5469b36920acfb2f49832019848c2`입니다.
-새 저장소는 그 저장소 안의 mini-watch 소스만 추려 시작했고, Docker 설정·실행 실험을 별도 Git 기록으로 남겼습니다.
+이후 최종 커밋에는 monitor/backend/db.py의 실행 환경 우선순위 수정, 기존 회귀 테스트의 users·CSRF·이벤트 토큰·health 계약 갱신,
+HTTP smoke·diff·실제 결과·배포 계획·필수/선택 대응 문서를 포함한다. 문서 자체의 커밋 SHA는 Git 이력에서 확인한다.
 
-## 선택 4: 실제 Docker 개선 PR
-
-- 작업 브랜치: `codex/monitor-readiness`
-- PR: **https://github.com/RockCandy444/mini-watch-compose/pull/1**
-- 검토 의견: https://github.com/RockCandy444/mini-watch-compose/pull/1#issuecomment-6119394352
-- 병합 방식: merge commit. 실제 `MERGED` 상태·변경 파일·커밋·검토 의견은 [pr-result.json](evidence/pr-result.json)에 저장했습니다.
-- GitHub에서 받은 최종 PR diff 원문: [pr-diff.txt](evidence/pr-diff.txt).
-
-개선 전에는 DB 준비만 기다리고 API 자체의 준비를 확인하지 않았습니다.
-개선 후 감시 `/health`는 실제 DB 쿼리 `SELECT 1`이 성공해야 200을 반환하고, DB 실패는 상세 정보를 노출하지 않는 503이 됩니다.
-Compose의 monitor-api healthcheck가 이 응답을 검사하고 monitor-web·monitor-gateway가 API의 `service_healthy`를 기다립니다.
-
-직접 변경한 소스는 `compose-monitor.yaml`, `monitor/backend/app.py`, `monitor/backend/tests/test_health.py`입니다.
-공개 포트와 망 참여는 늘리지 않았고, 같은 Compose의 서비스만 의존하게 구성했는지 diff에서 확인했습니다.
-기록·메모 조회 인증은 그대로 보호되는지 기존 통합 테스트로 확인했습니다.
-본인 PR의 diff를 직접 읽고 검토 의견을 기록한 뒤 병합했습니다. 다른 사람이 독립적으로 승인한 리뷰로 주장하지 않습니다.
-
-사용한 실제 명령:
+오류 수정 [diff](verification/sentry-fix.diff):
 
 ```powershell
-git switch -c codex/monitor-readiness
-# healthcheck·준비 응답·테스트 변경 후 Docker 실행 검증
-git add compose-monitor.yaml monitor/backend/app.py monitor/backend/tests/test_health.py evidence/final.txt
-git commit -m "fix: wait for monitor API database readiness before starting gateway"
-git push -u origin codex/monitor-readiness
-gh pr create --repo RockCandy444/mini-watch-compose --base main --head codex/monitor-readiness --title "감시 API의 DB 준비 확인 후 화면과 gateway 시작" --body-file .local/pr-body.md
-gh pr diff 1 --repo RockCandy444/mini-watch-compose --color never --allow-escape-sequences
-gh pr comment 1 --repo RockCandy444/mini-watch-compose --body-file .local/pr-review.md
-gh pr merge 1 --repo RockCandy444/mini-watch-compose --merge
-git switch main
-git pull --ff-only origin main
-git log --oneline -6
+git diff 192144ba4e564d671e756d2a5948a3f70f032cf0 853988babef60cd36316058c26ea78f5d3aab7f4 -- general/app.py
+git log --oneline --decorate -8
 ```
 
-`.local`의 PR 본문·검토 의견 임시 파일은 Git에서 제외했습니다. 실제 게시된 내용은 PR과 `pr-result.json`에서 확인할 수 있습니다.
-로그 안의 터미널 색상 제어 문자 때문에 `gh pr diff`가 요구한 `--allow-escape-sequences`를 사용하여 원본 diff를 저장했습니다.
+실제 원인은 result=1/0의 ZeroDivisionError다. result=1/1로 정상 JSON을 반환하며 다른 기존 기능을 제거하지 않았다.
+ENABLE_SENTRY_TEST=false가 최종 예시이고 로그인 없는 접근 401·비활성 404를 보존한다.
+재현 이미지의 오류 로그와 최종 이미지의 정상 응답을 직접 확인했다. 실제 Sentry 수신은 미확인이다.
 
-## 개선 검증과 병합 후 확인
-
-[final.txt](evidence/final.txt)에서 감시 테스트 **14개**(기존 PostgreSQL 8개, 회원가입 프록시 4개, 준비 응답 2개)와 일반 PostgreSQL 테스트 **12개**, 총 **26개 통과**를 확인할 수 있습니다.
-감시 API·두 DB는 healthy이고 7개 서비스가 실행 중입니다.
-
-병합된 main의 커밋 식별자를 먼저 기록하고 다음을 실행했습니다.
-
-```powershell
-python verification/run.py postmerge
-```
-
-[postmerge.txt](evidence/postmerge.txt)에 일반 이미지 최종 소스 재빌드, Compose 설정 검사·ps·logs·공유 망 inspect·이름 조회,
-새 로그인 실패/성공의 전달, 원래 메모 #1 상세 재조회, 내부 `/health` 200·database ready 응답을 기록합니다.
-최종 문서·체크리스트 커밋은 `git log -1`과 GitHub main에서 확인할 수 있습니다.
+수정 후 add·commit·push, Render의 배포 SHA 확인, 같은 로그인/요청의 정상 결과 재확인, ENABLE_SENTRY_TEST=false 복구 순서로 배포한다.
+Render 배포는 아직 수행하지 않았다. Sentry Resolve만으로 코드나 배포가 바뀌지 않는다.

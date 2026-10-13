@@ -41,7 +41,7 @@ class MonitorIntegrationTests(unittest.TestCase):
             patcher = patch.object(module, 'connect_db', test_connection)
             patcher.start()
             cls.addClassCleanup(patcher.stop)
-        cls.app = create_app({'TESTING': True, 'SECRET_KEY': 'integration-test-secret', 'FRONTEND_ORIGIN': 'http://127.0.0.1:5173'})
+        cls.app = create_app({'TESTING': True, 'SECRET_KEY': 'integration-test-secret', 'EVENT_TOKEN': 'test-only-event-token', 'FRONTEND_ORIGIN': 'http://127.0.0.1:5173'})
 
     @classmethod
     def drop_schema(cls):
@@ -50,13 +50,15 @@ class MonitorIntegrationTests(unittest.TestCase):
 
     def setUp(self):
         with self.test_connection() as conn:
-            conn.execute('TRUNCATE notes, http_events, monitor_users RESTART IDENTITY')
-            conn.execute('INSERT INTO monitor_users (username, password_hash) VALUES (%s, %s)', ('operator', generate_password_hash('test-only-password')))
+            conn.execute('TRUNCATE notes, http_events, users RESTART IDENTITY')
+            conn.execute('INSERT INTO users (username, password_hash) VALUES (%s, %s)', ('operator', generate_password_hash('test-only-password')))
         self.client = self.app.test_client()
+        self.client.environ_base['HTTP_X_EVENT_TOKEN'] = 'test-only-event-token'
 
     def login(self):
         response = self.client.post('/api/auth/login', json={'username': 'operator', 'password': 'test-only-password'})
         self.assertEqual(response.status_code, 200)
+        self.client.environ_base['HTTP_X_CSRF_TOKEN'] = response.json['csrf_token']
         return response
 
     def create_note(self):

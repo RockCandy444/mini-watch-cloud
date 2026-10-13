@@ -11,7 +11,7 @@ SETTINGS = dotenv_values(Path(__file__).with_name('.env'))
 
 def setting(name, default=None):
     # Keep separate service settings when both apps are tested in one process.
-    return os.environ.get('MONITOR_' + name, SETTINGS.get(name, os.environ.get(name, default)))
+    return os.environ.get('MONITOR_' + name, os.environ.get(name, SETTINGS.get(name, default)))
 
 
 def connect_db():
