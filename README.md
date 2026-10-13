@@ -73,9 +73,9 @@ node verification/cloud-smoke.cjs
 
 | 이번 커밋 | 내용 |
 | --- | --- |
-| 192144ba4e564d671e756d2a5948a3f70f032cf0 | 배포·외부 DB·세션·토큰·Sentry·Next 프록시 적용, guarded 실습 오류 재현 상태 |
-| 853988babef60cd36316058c26ea78f5d3aab7f4 | general sentry_test() 나눗셈 오류 수정, 보호·정보 제외 테스트 |
-| 46dbb3d10976756cefd2b617e090fdbc80f21b33 | 최종 DB 설정·회귀/HTTP/화면 검증·배포 계획·필수 20/선택 4 문서 |
+| 6d14279f1dc1135f9ccc3755328924159fd19e54 | 배포·외부 DB·세션·토큰·Sentry·Next 프록시 적용, guarded 실습 오류 재현 상태 |
+| 979f7da856ff96183e86f0c012f2c3a73ce5bf41 | general sentry_test() 나눗셈 오류 수정, 보호·정보 제외 테스트 |
+| 3ad433c228111a06f6718617e85311d340f3800d | 최종 DB 설정·회귀/HTTP/화면 검증·배포 계획·필수 20/선택 4 문서 |
 
 최종 설정·검증·문서 커밋은 [GIT_WORK.md](GIT_WORK.md)에 기록한다.
 오류 원인·수정 효과·보호 조건과 [실제 diff](verification/sentry-fix.diff), 잠시 true로 확인 후 false로 끄는 절차를 배포 계획에 포함했다.

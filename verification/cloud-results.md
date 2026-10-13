@@ -17,7 +17,7 @@ Date: 2026-10-13 (Asia/Seoul). External cloud services were not deployed.
 - General real-PostgreSQL regression suite: 12 tests passed, disposable schema removed after testing.
 - Monitor real-PostgreSQL, signup proxy and health suite: 14 tests passed, disposable schema removed after testing.
 - Sentry contract suite: 2 tests passed in the final general image. Disabled endpoint=404, anonymous=401, authenticated enabled endpoint=200/result 1.0. Privacy filter and SDK options validated without contacting Sentry.
-- Exercise image from commit 192144b reproduced ZeroDivisionError/500 under the same authenticated/feature-enabled conditions. Final fix is commit 853988b.
+- Exercise image from commit 6d14279 reproduced ZeroDivisionError/500 under the same authenticated/feature-enabled conditions. Final fix is commit 979f7da.
 
 ## Browser verification
 

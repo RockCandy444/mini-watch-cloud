@@ -125,8 +125,8 @@ Render는 Compose·Nginx·local DB를 실행하지 않고 각 앱 Dockerfile로 
 
 | 단계 | 실제 SHA | 변경 |
 | --- | --- | --- |
-| 적용·재현 | 192144ba4e564d671e756d2a5948a3f70f032cf0 | 배포·SSL·세션·토큰·Sentry·Next 적용. 활성·로그인 후 general/app.py의 sentry_test()에서 1/0 → ZeroDivisionError / 500 |
-| 수정 | 853988babef60cd36316058c26ea78f5d3aab7f4 | 같은 함수의 1/0 → 1/1, 정상 JSON result 1.0 / 200. 로그인·feature flag 유지, 보호·정보 제외 검증 추가 |
+| 적용·재현 | 6d14279f1dc1135f9ccc3755328924159fd19e54 | 배포·SSL·세션·토큰·Sentry·Next 적용. 활성·로그인 후 general/app.py의 sentry_test()에서 1/0 → ZeroDivisionError / 500 |
+| 수정 | 979f7da856ff96183e86f0c012f2c3a73ce5bf41 | 같은 함수의 1/0 → 1/1, 정상 JSON result 1.0 / 200. 로그인·feature flag 유지, 보호·정보 제외 검증 추가 |
 
 두 SHA의 [실제 diff](verification/sentry-fix.diff)와 전체 Git 이력을 함께 제공한다.
 재현 이미지는 비활성 404·미로그인 401·활성 로그인 500을 실제 확인했고, 최종 이미지는 같은 조건에서 200과 result 1.0을 확인했다.

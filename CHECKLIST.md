@@ -25,7 +25,7 @@
 | 17. 두 Flask Sentry SDK·앱 시작 env 초기화 | [x] | requirements sentry-sdk[flask], observability.py, create_app()에서 configure_errors. app:app import에도 실행. DSN/env/version을 환경에서 읽음 |
 | 18. 정상 sentry-test·로그인·flag·최종 false | [x] | general/app.py sentry_test() 1/1 정상 JSON, api_access_error/flag 유지. 예시 false. 실제 404·401·500→200 검증 |
 | 19. 주소 흐름·local Compose·커밋/push/배포 확인·경로 비활성 | [x] | deployment-plan.md 요청 흐름·Compose 차이·배포 SHA 점검·동일 요청 확인 후 false 복구 절차 |
-| 20. 이번/오류 수정 SHA·파일·원인·수정 일치 | [x] | README·배포 계획·GIT_WORK.md, 192144b→853988b 및 verification/sentry-fix.diff. URL·수신 증빙을 완료라고 표시하지 않음 |
+| 20. 이번/오류 수정 SHA·파일·원인·수정 일치 | [x] | README·배포 계획·GIT_WORK.md, 6d14279→979f7da 및 verification/sentry-fix.diff. URL·수신 증빙을 완료라고 표시하지 않음 |
 
 | 선택 | 확인 | 실제 파일·근거 |
 | --- | --- | --- |

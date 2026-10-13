@@ -7,16 +7,16 @@
 | SHA | 변경 |
 | --- | --- |
 | 2e4b61d | Day1 기존 Compose·게시글·감시 기능 완료 상태. 시작 기준 |
-| 192144ba4e564d671e756d2a5948a3f70f032cf0 | 세 앱 Dockerfile의 앱별 context와 PORT 실행, DB_SSLMODE, 일반 세션, 두 서버 이벤트 토큰, 감시 users 보존 이행, CSRF, 두 Sentry 초기화, Next Route Handler와 production 서버 실행 적용. 일반 실습 오류 재현 상태 포함 |
-| 853988babef60cd36316058c26ea78f5d3aab7f4 | general/app.py의 sentry_test() 분모 0을 1로 수정. flag와 로그인 검사 유지. verification/test_sentry.py로 404·401·500→200 및 정보 제외 확인 |
-| 46dbb3d10976756cefd2b617e090fdbc80f21b33 | DB 실행 환경 우선순위 수정, users·CSRF·토큰·health 회귀 테스트 갱신, HTTP smoke·스크린샷·배포 계획·필수 20/선택 4 대응·검증 실행 도구와 실제 결과 포함 |
+| 6d14279f1dc1135f9ccc3755328924159fd19e54 | 세 앱 Dockerfile의 앱별 context와 PORT 실행, DB_SSLMODE, 일반 세션, 두 서버 이벤트 토큰, 감시 users 보존 이행, CSRF, 두 Sentry 초기화, Next Route Handler와 production 서버 실행 적용. 일반 실습 오류 재현 상태 포함 |
+| 979f7da856ff96183e86f0c012f2c3a73ce5bf41 | general/app.py의 sentry_test() 분모 0을 1로 수정. flag와 로그인 검사 유지. verification/test_sentry.py로 404·401·500→200 및 정보 제외 확인 |
+| 3ad433c228111a06f6718617e85311d340f3800d | DB 실행 환경 우선순위 수정, users·CSRF·토큰·health 회귀 테스트 갱신, HTTP smoke·스크린샷·배포 계획·필수 20/선택 4 대응·검증 실행 도구와 실제 결과 포함 |
 
 마지막 문서 커밋은 위 실제 최종 구현·검증 SHA를 기록한다. 문서 자체의 커밋 SHA는 Git 이력에서 확인한다.
 
 오류 수정 [diff](verification/sentry-fix.diff):
 
 ```powershell
-git diff 192144ba4e564d671e756d2a5948a3f70f032cf0 853988babef60cd36316058c26ea78f5d3aab7f4 -- general/app.py
+git diff 6d14279f1dc1135f9ccc3755328924159fd19e54 979f7da856ff96183e86f0c012f2c3a73ce5bf41 -- general/app.py
 git log --oneline --decorate -8
 ```
 
