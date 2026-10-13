@@ -7,6 +7,7 @@ import { register } from "../api/auth";
 
 export default function RegisterForm({ accountType }) {
   const general = accountType === "general";
+  const generalLoginUrl = `${(process.env.NEXT_PUBLIC_GENERAL_URL || "http://localhost:8081").replace(/\/$/, "")}/login`;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -63,7 +64,7 @@ export default function RegisterForm({ accountType }) {
           {created ? (
             <div className="registration-success">
               <p role="status" className="notice"><strong>{created.username}</strong> 계정이 만들어졌습니다.<br />입력한 비밀번호로 로그인해 주세요.</p>
-              {general ? <a className="primary login-submit" href="http://localhost:8081/login">게시판 로그인으로 이동 <ArrowRight size={18} /></a> : <Link className="primary login-submit" href="/">대시보드 로그인으로 이동 <ArrowRight size={18} /></Link>}
+              {general ? <a className="primary login-submit" href={generalLoginUrl}>게시판 로그인으로 이동 <ArrowRight size={18} /></a> : <Link className="primary login-submit" href="/">대시보드 로그인으로 이동 <ArrowRight size={18} /></Link>}
               <button className="text-button" onClick={() => { setCreated(null); setUsername(""); setError(""); }}>다른 계정 만들기</button>
             </div>
           ) : (
@@ -83,7 +84,7 @@ export default function RegisterForm({ accountType }) {
                   <button className="primary login-submit" type="submit" disabled={busy}>{busy ? "계정 만드는 중…" : "회원가입"}<ArrowRight size={18} /></button>
                 </fieldset>
               </form>
-              <p className="login-help">이미 계정이 있나요? {general ? <a className="auth-link" href="http://127.0.0.1:5100/login">게시판 로그인</a> : <Link className="auth-link" href="/">로그인</Link>}</p>
+              <p className="login-help">이미 계정이 있나요? {general ? <a className="auth-link" href={generalLoginUrl}>게시판 로그인</a> : <Link className="auth-link" href="/">로그인</Link>}</p>
             </>
           )}
         </div>
