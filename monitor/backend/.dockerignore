@@ -13,3 +13,6 @@ node_modules
 *.db
 *.sqlite*
 test-results
+learning/data/*
+!learning/data/.gitkeep
+*.pcap

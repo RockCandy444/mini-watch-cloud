@@ -5,6 +5,29 @@
   font-synthesis: none;
   font-size: 14px;
 }
+.analysis-panel { background: #fff; border: 1px solid #e8e5f0; border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+.analysis-heading, .analysis-result { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.analysis-window { color: #827691; font-size: 12px; }
+.analysis-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+.analysis-controls input { width: 104px; border: 1px solid #dcd6e8; border-radius: 8px; padding: 9px; }
+.analysis-boundary { overflow-wrap: anywhere; color: #787081; font-size: 12px; }
+.analysis-empty { padding: 16px 0; color: #827a91; }
+.analysis-card { margin-top: 20px; background: #f8f9fc; border: 1px solid #e5e8ef; border-radius: 12px; padding: 20px; }
+.analysis-card.candidate { background: #faf7ff; border-color: #cfc1f0; }
+.analysis-verdict { border-radius: 20px; padding: 6px 14px; background: #e9edf3; font-size: 13px; }
+.candidate .analysis-verdict { background: #ece2ff; color: #6946aa; }
+.analysis-metrics { display: flex; gap: 40px; flex-wrap: wrap; margin: 20px 0; }
+.analysis-metrics span { display: block; font-size: 12px; color: #81778f; margin-bottom: 4px; }
+.analysis-metrics strong { font-size: 30px; font-variant-numeric: tabular-nums; }
+.analysis-metrics small { font-size: 13px; margin-left: 6px; font-weight: 400; }
+.analysis-evidence { margin-top: 18px; }
+.analysis-evidence summary { cursor: pointer; font-weight: 600; padding: 10px 0; color: #7355a2; }
+.analysis-table-scroll { overflow-x: auto; }
+.analysis-evidence table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 12px; }
+.analysis-evidence caption { text-align: left; padding: 12px 0; color: #827691; }
+.analysis-evidence th, .analysis-evidence td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e6e1ec; }
+.analysis-evidence .context-row { background: #fff4e5; }
+@media (max-width: 640px) { .analysis-panel { padding: 16px; } .analysis-heading { align-items: flex-start; flex-direction: column; } .analysis-metrics { gap: 24px; } }
 * {
   box-sizing: border-box;
 }

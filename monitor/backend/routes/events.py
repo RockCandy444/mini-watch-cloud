@@ -2,25 +2,9 @@ import hmac
 from flask import Blueprint, request, current_app
 from monitor.backend.repositories import events
 from monitor.backend.routes.auth import require_login
+from monitor.backend.event_rules import EVENT_TYPES, make_event
 
 events_bp = Blueprint('monitor_events', __name__, url_prefix='/api/events')
-EVENT_TYPES = {'http_request', 'login_success', 'login_failure'}
-
-
-def make_event(data):
-    if not isinstance(data, dict):
-        return None
-    method, path, status = data.get('method'), data.get('path'), data.get('status_code')
-    if not isinstance(method, str) or method not in {'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'}:
-        return None
-    if not isinstance(path, str) or not path.startswith('/') or len(path) > 500:
-        return None
-    if type(status) is not int or not 100 <= status <= 599:
-        return None
-    event_type = 'http_request'
-    if method == 'POST' and path == '/auth/login':
-        event_type = {200: 'login_success', 401: 'login_failure'}.get(status, event_type)
-    return dict(method=method, path=path, status_code=status, event_type=event_type)
 
 
 @events_bp.post('')

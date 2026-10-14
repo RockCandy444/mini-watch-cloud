@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import EventsPanel from "./EventsPanel";
 import NotesPanel from "./NotesPanel";
+import AnalysisClient from "./AnalysisClient";
 
 export default function Dashboard({ user, onLogout }) {
   const tab = usePathname() === "/notes" ? "notes" : "events";
@@ -100,7 +101,7 @@ export default function Dashboard({ user, onLogout }) {
               {error}
             </p>
           )}
-          {tab === "events" ? <EventsPanel /> : <NotesPanel />}
+          {tab === "events" ? <><AnalysisClient /><EventsPanel /></> : <NotesPanel />}
         </main>
         <footer className="workspace-footer">
           작은 기록, 더 나은 관찰.<span>mini watch © 2026</span>

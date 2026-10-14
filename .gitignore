@@ -16,3 +16,6 @@ day2-materials/
 *.db
 *.sqlite*
 *.log
+monitor/backend/learning/data/*
+!monitor/backend/learning/data/.gitkeep
+*.pcap

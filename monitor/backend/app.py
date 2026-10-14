@@ -17,6 +17,7 @@ from monitor.backend.db import setting, connect_db
 from monitor.backend.routes.auth import auth_bp
 from monitor.backend.routes.events import events_bp
 from monitor.backend.routes.notes import notes_bp
+from monitor.backend.routes.analysis import analysis_bp
 from common.registration import allowed_origin
 from monitor.backend.observability import configure_errors
 
@@ -37,7 +38,7 @@ def create_app(test_config=None):
     )
     if test_config:
         app.config.update(test_config)
-    for bp in (auth_bp, events_bp, notes_bp):
+    for bp in (auth_bp, events_bp, notes_bp, analysis_bp):
         app.register_blueprint(bp)
 
     @app.post('/general-api/auth/register')

@@ -3,6 +3,7 @@ Run from the project root: python -m unittest discover -s monitor/backend/tests 
 """
 import uuid
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 from psycopg import sql
@@ -65,6 +66,57 @@ class MonitorIntegrationTests(unittest.TestCase):
         response = self.client.post('/api/notes', json={'title': '  없는 게시글 확인  ', 'body': '  /board/999의 404 확인  ', 'status': '확인 전'})
         self.assertEqual(response.status_code, 201)
         return response.json['note']
+
+    def test_analysis_login_and_argument_validation(self):
+        self.assertEqual(self.client.get('/api/analysis?after_id=0').status_code, 401)
+        self.assertEqual(self.client.get('/api/analysis/observation').status_code, 401)
+        self.login()
+        for query in ('', 'after_id=-1', 'after_id=true', 'after_id=0&threshold=0',
+                      'after_id=0&threshold=1.5', 'after_id=0&threshold=100001',
+                      'after_id=0&after_id=1', 'after_id=0&reference_time=bad',
+                      'after_id=0&reference_time=2026-10-14T00:00:00',
+                      'after_id=0&reference_time=2999-01-01T00:00:00Z'):
+            self.assertEqual(self.client.get('/api/analysis?' + query).status_code, 400, query)
+
+    def test_analysis_database_window_boundary_and_no_deletion(self):
+        self.login()
+        reference = datetime.now(timezone.utc) - timedelta(seconds=5)
+        with self.test_connection() as conn:
+            for offset in (-61, -60, -2, 0, 1):
+                conn.execute('INSERT INTO http_events (occurred_at, method, path, status_code, event_type) '
+                             'VALUES (%s, %s, %s, %s, %s)',
+                             (reference + timedelta(seconds=offset), 'GET', '/', 200, 'post_list'))
+        with patch('monitor.backend.learning.support.connect_db', self.test_connection):
+            response = self.client.get('/api/analysis', query_string={'after_id': 2, 'reference_time': reference.isoformat(), 'threshold': 2})
+            self.assertEqual(response.status_code, 200)
+            card = response.json['cards'][0]
+            self.assertEqual(card['evidence'], ['http-3', 'http-4'])
+            self.assertEqual((card['observed'], card['matched']), (2, True))
+            # Include the exact lower bound when the ID boundary permits it.
+            response = self.client.get('/api/analysis', query_string={'after_id': 0, 'reference_time': reference.isoformat()})
+            self.assertEqual(response.json['cards'][0]['evidence'], ['http-2', 'http-3', 'http-4'])
+            boundary = self.client.get('/api/analysis/observation').json['after_id']
+            self.assertEqual(boundary, 5)
+            empty = self.client.get('/api/analysis', query_string={'after_id': boundary}).json['cards'][0]
+            self.assertEqual((empty['observed'], empty['records']), (0, []))
+        with self.test_connection() as conn:
+            self.assertEqual(conn.execute('SELECT count(*) AS n FROM http_events').fetchone()['n'], 5)
+
+    def test_analysis_database_reference_time_freezes_evidence(self):
+        self.login()
+        for _ in range(12):
+            events.create_event({'method': 'GET', 'path': '/', 'status_code': 200, 'event_type': 'post_list'})
+        events.create_event({'method': 'GET', 'path': '/training-missing', 'status_code': 404, 'event_type': 'request_error'})
+        with patch('monitor.backend.learning.support.connect_db', self.test_connection):
+            first = self.client.get('/api/analysis?after_id=0&threshold=10').json
+            events.create_event({'method': 'GET', 'path': '/', 'status_code': 200, 'event_type': 'post_list'})
+            second = self.client.get('/api/analysis', query_string={'after_id': first['after_id'],
+                'reference_time': first['reference_time'], 'threshold': 20}).json
+            self.assertEqual((first['cards'][0]['observed'], len(first['cards'][0]['records'])), (12, 13))
+            self.assertEqual(first['cards'][0]['evidence'], second['cards'][0]['evidence'])
+            self.assertEqual(first['cards'][0]['records'], second['cards'][0]['records'])
+            self.assertTrue(first['cards'][0]['matched'])
+            self.assertFalse(second['cards'][0]['matched'])
 
     def test_registration_orm_hash_duplicate_and_login(self):
         payload = {'username': ' new_student ', 'password': 'new-test-password', 'password_confirm': 'new-test-password'}

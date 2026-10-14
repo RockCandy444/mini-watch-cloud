@@ -30,6 +30,11 @@ services:
       EVENT_TOKEN: classroom-day2-event-token-only-not-for-production
       SECRET_KEY: classroom-day2-monitor-session-key-only
       FRONTEND_ORIGIN: http://localhost:8082
+      GENERAL_API_URL: http://general-api:5000
+    volumes:
+      - ./monitor/backend/learning:/app/monitor/backend/learning:ro
+      - ./monitor/backend/routes:/app/monitor/backend/routes:ro
+      - ./monitor/backend/event_rules.py:/app/monitor/backend/event_rules.py:ro
     depends_on:
       monitor-db:
         condition: service_healthy
